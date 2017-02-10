@@ -42,14 +42,6 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
 
 
 
-
-
-
-
-
-
-
-
     public LoginHttpRequest(Context context,String username,String password){
         this.mainContext = context;
         this.userName = username;
@@ -72,14 +64,11 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
 
     }
 
-
-
     @Override
     protected User doInBackground(Void... params) {
         HttpGet request = new HttpGet(URL);
         //RegisterHttpRequest.JSONResponseHandler responseHandler = new RegisterHttpRequest.JSONResponseHandler();
         LoginHttpRequest.JSONResponseHandler responseHandler = new LoginHttpRequest.JSONResponseHandler();
-
         try {
 
             return mClient.execute(request, responseHandler);
