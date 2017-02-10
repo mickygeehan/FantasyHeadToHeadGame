@@ -13,6 +13,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -110,10 +113,29 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, String> {
             String JSONResponse = new BasicResponseHandler()
                     .handleResponse(response);
 
-            System.out.println(JSONResponse);
+          //  System.out.println(JSONResponse);
+
+            String resp ="";
+
+            JSONObject obj = null;
+            try {
+                obj = new JSONObject(JSONResponse);
+                JSONArray geodata = obj.getJSONArray("Users");
+                int n = geodata.length();
+
+                for (int i = 0; i < n; ++i) {
+                    final JSONObject user = geodata.getJSONObject(i);
+                    resp = user.getString("username")+"  "+user.getString("password")+"  "+user.getString("email")+user.getInt("ID");
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            //System.out.println(resp);
 
 
-            return JSONResponse;
+            return resp;
         }
 
 
