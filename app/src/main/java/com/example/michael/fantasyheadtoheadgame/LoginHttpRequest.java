@@ -25,7 +25,7 @@ import java.util.List;
  * Created by michaelgeehan on 10/02/2017.
  */
 
-public class LoginHttpRequest extends AsyncTask<Void, Void, String> {
+public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
 
     //String URL = "http://192.168.1.105:8888/register.php?userN=hjjhgewrtrtrtiigihuhuhuoohu&password=hi&email=jim@gmail.com&fullN=djdjd";
 
@@ -67,7 +67,7 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, String> {
 
 
     @Override
-    protected String doInBackground(Void... params) {
+    protected User doInBackground(Void... params) {
         HttpGet request = new HttpGet(URL);
         //RegisterHttpRequest.JSONResponseHandler responseHandler = new RegisterHttpRequest.JSONResponseHandler();
         LoginHttpRequest.JSONResponseHandler responseHandler = new LoginHttpRequest.JSONResponseHandler();
@@ -92,22 +92,22 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, String> {
     }
 
     @Override
-    protected void onPostExecute(String result) {
+    protected void onPostExecute(User userObj) {
         //System.out.println(result);
-        System.out.println("onPost"+result);
+        //System.out.println("onPost"+result);
         asyncDialog.dismiss();
         mClient.close();
-        Login.onBackgroundTaskDataObtained(result);
+        Login.onBackgroundTaskDataObtained(userObj);
 
     }
 
 
 
-    private class JSONResponseHandler implements ResponseHandler<String> {
+    private class JSONResponseHandler implements ResponseHandler<User> {
 
 
         @Override
-        public String handleResponse(HttpResponse response)
+        public User handleResponse(HttpResponse response)
                 throws ClientProtocolException, IOException {
 
             String JSONResponse = new BasicResponseHandler()
@@ -115,7 +115,7 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, String> {
 
           //  System.out.println(JSONResponse);
 
-            String resp ="";
+            User userObj = null;
 
             JSONObject obj = null;
             try {
@@ -125,7 +125,8 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, String> {
 
                 for (int i = 0; i < n; ++i) {
                     final JSONObject user = geodata.getJSONObject(i);
-                    resp = user.getString("username")+"  "+user.getString("password")+"  "+user.getString("email")+user.getInt("ID");
+                    //resp = user.getString("username")+"  "+user.getString("password")+"  "+user.getString("email")+user.getInt("ID");
+                    userObj = new User(user.getString("username"),user.getString("email"),user.getInt("ID"));
                 }
 
             } catch (JSONException e) {
@@ -135,7 +136,7 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, String> {
             //System.out.println(resp);
 
 
-            return resp;
+            return userObj;
         }
 
 

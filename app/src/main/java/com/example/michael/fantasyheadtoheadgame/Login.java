@@ -42,9 +42,15 @@ public class Login extends Activity {
 
     }
 
-    public static void onBackgroundTaskDataObtained(String result) {
-        Toast.makeText(context, result,
-                Toast.LENGTH_LONG).show();
+    public static void onBackgroundTaskDataObtained(User userObj) {
+        if(userObj != null){
+            Toast.makeText(context, userObj.getUsername(),
+                    Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(context, "I'm sorry your username/password is incorrect!!",
+                    Toast.LENGTH_LONG).show();
+        }
+
 
     }
 }
