@@ -33,7 +33,7 @@ public class Login extends Activity {
         // startActivity(intent);
         LoginHttpRequest logIn = new LoginHttpRequest(context, userName.getText().toString(), userPass.getText().toString());
         logIn.execute();
-
+        
     }
 
     public void registerUser(View view) {
@@ -44,13 +44,12 @@ public class Login extends Activity {
 
     public static void onBackgroundTaskDataObtained(User userObj) {
         if(userObj != null){
-            Toast.makeText(context, userObj.getUsername(),
-                    Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(context, Home.class);
+            intent.putExtra("UserClass", userObj);
+            context.startActivity(intent);
         }else{
             Toast.makeText(context, "I'm sorry your username/password is incorrect!!",
                     Toast.LENGTH_LONG).show();
         }
-
-
     }
 }

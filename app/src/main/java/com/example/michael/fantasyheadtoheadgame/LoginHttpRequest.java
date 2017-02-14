@@ -27,11 +27,7 @@ import java.util.List;
 
 public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
 
-    //String URL = "http://192.168.1.105:8888/register.php?userN=hjjhgewrtrtrtiigihuhuhuoohu&password=hi&email=jim@gmail.com&fullN=djdjd";
-
-    //String URL = "http://192.168.1.105:8888/register.php?userN=ComingFromAndroidPhone&password=hi&email=jim@gmail.com&fullN=djdjd";
     String URL;
-
     AndroidHttpClient mClient = AndroidHttpClient.newInstance("");
 
     Context mainContext;
@@ -39,8 +35,6 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
 
     //user details
     String userName,userPass;
-
-
 
     public LoginHttpRequest(Context context,String username,String password){
         this.mainContext = context;
@@ -129,8 +123,6 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-            //System.out.println(resp);
 
 
             return userObj;

@@ -1,10 +1,12 @@
 package com.example.michael.fantasyheadtoheadgame;
 
+import java.io.Serializable;
+
 /**
  * Created by michaelgeehan on 10/02/2017.
  */
 
-public class User {
+public class User implements Serializable {
     private String username,email;
     private int id;
 
