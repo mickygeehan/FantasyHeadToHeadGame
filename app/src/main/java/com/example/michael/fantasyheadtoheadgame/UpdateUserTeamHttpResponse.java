@@ -25,7 +25,7 @@ public class UpdateUserTeamHttpResponse extends AsyncTask<Object, Object, String
     AndroidHttpClient mClient = AndroidHttpClient.newInstance("");
 
     private Context mainContext;
-    private ProgressDialog asyncDialog;
+    private ProgressDialog asyncDialog; 
 
 
 
