@@ -6,27 +6,23 @@ import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by michaelgeehan on 13/02/2017.
  */
 
-public class GetWeeklyTeamHttpRequest extends AsyncTask<Void, Void, ArrayList<Player>> {
+public class GetUserTeamHttpRequest extends AsyncTask<Void, Void, ArrayList<Player>> {
+    public UserTeamAsyncResponse delegate = null;
     String URL;
     AndroidHttpClient mClient = AndroidHttpClient.newInstance("");
 
@@ -35,16 +31,16 @@ public class GetWeeklyTeamHttpRequest extends AsyncTask<Void, Void, ArrayList<Pl
 
 
 
-    public GetWeeklyTeamHttpRequest(Context context){
+    public GetUserTeamHttpRequest(Context context, int id){
         this.mainContext = context;
-        this.URL = "http://10.0.2.2:8888/GetWeeklyTeam.php";
+        this.URL = "http://10.0.2.2:8888/GetUserTeam.php?userID="+id;
     }
 
 
     @Override
     protected ArrayList<Player> doInBackground(Void... params) {
         HttpGet request = new HttpGet(URL);
-        GetWeeklyTeamHttpRequest.JSONResponseHandler responseHandler = new GetWeeklyTeamHttpRequest.JSONResponseHandler();
+        GetUserTeamHttpRequest.JSONResponseHandler responseHandler = new GetUserTeamHttpRequest.JSONResponseHandler();
         try {
 
             return mClient.execute(request, responseHandler);
@@ -69,7 +65,7 @@ public class GetWeeklyTeamHttpRequest extends AsyncTask<Void, Void, ArrayList<Pl
 
         asyncDialog.dismiss();
         mClient.close();
-        Home.onBackgroundTaskDataObtained(players);
+        delegate.processFinish(players);
 
     }
 
@@ -85,7 +81,7 @@ public class GetWeeklyTeamHttpRequest extends AsyncTask<Void, Void, ArrayList<Pl
             String JSONResponse = new BasicResponseHandler()
                     .handleResponse(response);
 
-            JSONResponse = JSONResponse.replace("\\","");
+           // JSONResponse = JSONResponse.replace("\\u","");
 
             ArrayList<Player> players = new ArrayList<Player>();
             Player playerObj = null;
@@ -97,7 +93,7 @@ public class GetWeeklyTeamHttpRequest extends AsyncTask<Void, Void, ArrayList<Pl
 
                 for (int i = 0; i < n; ++i) {
                     final JSONObject player = geodata.getJSONObject(i);
-                    playerObj = new Player(player.getString("firstName"),player.getString("secondName"),player.getString("webName"),player.getInt("teamCode"),
+                    playerObj = new Player(i+1,player.getString("firstName"),player.getString("secondName"),player.getString("webName"),player.getInt("teamCode"),
                             player.getInt("id"),player.getInt("playerPosition"),player.getDouble("cost"));
                     
                     players.add(playerObj);

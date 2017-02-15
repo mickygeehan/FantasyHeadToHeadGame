@@ -5,11 +5,12 @@ package com.example.michael.fantasyheadtoheadgame;
  */
 
 public class Player {
+    int posInTeam;
     String firstName,secondName,webName;
     int teamCode,id,playerPosition;
     double cost;
 
-    public Player(String firstName, String secondName, String webName, int teamCode, int id, int playerPosition, double cost) {
+    public Player(int posInTeam, String firstName, String secondName, String webName, int teamCode, int id, int playerPosition, double cost) {
         this.firstName = firstName;
         this.secondName = secondName;
         this.webName = webName;
@@ -17,6 +18,15 @@ public class Player {
         this.id = id;
         this.playerPosition = playerPosition;
         this.cost = cost;
+        this.posInTeam = posInTeam;
+    }
+
+    public int getPosInTeam() {
+        return posInTeam;
+    }
+
+    public void setPosInTeam(int posInTeam) {
+        this.posInTeam = posInTeam;
     }
 
     public String getFirstName() {
