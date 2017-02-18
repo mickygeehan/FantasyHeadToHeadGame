@@ -1,4 +1,6 @@
-package com.example.michael.fantasyheadtoheadgame;
+package com.example.michael.fantasyheadtoheadgame.Interfaces;
+
+import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 
 import java.util.ArrayList;
 

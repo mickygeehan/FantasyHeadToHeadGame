@@ -1,53 +1,47 @@
-package com.example.michael.fantasyheadtoheadgame;
+package com.example.michael.fantasyheadtoheadgame.HttpRequests;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 
+import com.example.michael.fantasyheadtoheadgame.Classes.Player;
+import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
- * Created by michaelgeehan on 10/02/2017.
+ * Created by michaelgeehan on 17/02/2017.
  */
 
-public class RegisterHttpRequest extends AsyncTask<Void, Void, String> {
-
+public class FindHeadToHeadMatchHttpRequest extends AsyncTask<Object, Object, String> {
+    public UserTeamAsyncResponse delegate = null;
     String URL;
-
     AndroidHttpClient mClient = AndroidHttpClient.newInstance("");
 
-    Context mainContext;
-    ProgressDialog asyncDialog;
+    private Context mainContext;
+    private ProgressDialog asyncDialog;
 
 
 
-
-    public RegisterHttpRequest(Context context,String userName,String password,String email,String fullName){
+    public FindHeadToHeadMatchHttpRequest(Context context,int userID,String userName){
         this.mainContext = context;
-        //this.URL = "http://192.168.1.105:8888/register.php?userN="+userName+"&password="+password+"&email="+email+"&fullN="+fullName+"";
-        this.URL = "http://10.0.2.2:8888/register.php?userN="+userName+"&password="+password+"&email="+email+"&fullN="+fullName+"";
+        this.URL = "http://10.0.2.2:8888/FindHeadToHeadMatch.php?username="+userName+"&userID="+userID;
     }
 
 
-
     @Override
-    protected String doInBackground(Void... params) {
-
+    protected String doInBackground(Object... params) {
         HttpGet request = new HttpGet(URL);
-
-        //RegisterHttpRequest.JSONResponseHandler responseHandler = new RegisterHttpRequest.JSONResponseHandler();
-        RegisterHttpRequest.JSONResponseHandler responseHandler = new RegisterHttpRequest.JSONResponseHandler();
-
+        FindHeadToHeadMatchHttpRequest.JSONResponseHandler responseHandler = new FindHeadToHeadMatchHttpRequest.JSONResponseHandler();
         try {
 
             return mClient.execute(request, responseHandler);
@@ -60,22 +54,19 @@ public class RegisterHttpRequest extends AsyncTask<Void, Void, String> {
     }
 
 
-
     @Override
     protected void onPreExecute() {
         asyncDialog = new ProgressDialog(mainContext);
-        asyncDialog.setMessage("Registering");
-//        asyncDialog.show();
+        asyncDialog.setMessage("Finding Player");
+        asyncDialog.show();
     }
 
     @Override
-    protected void onPostExecute(String result) {
-        //System.out.println(result);
-        System.out.println("onPost"+result);
-      //  asyncDialog.dismiss();
+    protected void onPostExecute(String updated) {
+        System.out.println(updated);
+        asyncDialog.dismiss();
         mClient.close();
-        Register.onBackgroundTaskDataObtained(result);
-
+        delegate.processUserUpdate(updated);
 
     }
 
@@ -92,6 +83,7 @@ public class RegisterHttpRequest extends AsyncTask<Void, Void, String> {
                     .handleResponse(response);
 
 
+
             return JSONResponse;
         }
 
@@ -99,3 +91,5 @@ public class RegisterHttpRequest extends AsyncTask<Void, Void, String> {
     }
 
 }
+
+

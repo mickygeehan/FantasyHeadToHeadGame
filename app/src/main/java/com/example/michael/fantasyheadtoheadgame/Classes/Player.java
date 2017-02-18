@@ -1,4 +1,4 @@
-package com.example.michael.fantasyheadtoheadgame;
+package com.example.michael.fantasyheadtoheadgame.Classes;
 
 /**
  * Created by michaelgeehan on 14/02/2017.

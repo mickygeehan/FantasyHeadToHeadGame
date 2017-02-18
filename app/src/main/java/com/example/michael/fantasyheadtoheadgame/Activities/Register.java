@@ -1,4 +1,4 @@
-package com.example.michael.fantasyheadtoheadgame;
+package com.example.michael.fantasyheadtoheadgame.Activities;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.michael.fantasyheadtoheadgame.HttpRequests.RegisterHttpRequest;
+import com.example.michael.fantasyheadtoheadgame.R;
 
 /**
  * Created by michaelgeehan on 10/02/2017.
