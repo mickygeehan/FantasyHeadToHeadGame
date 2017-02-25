@@ -10,7 +10,9 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true">
-        <activity android:name=".Activities.Login">
+        <activity android:name=".MainHub"
+            android:theme="@style/AppTheme.NoActionBar"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,14 +22,17 @@
         <activity android:name=".Activities.Register" />
         <activity android:name=".SearchPlayers.SearchPlayers" />
         <activity
-            android:name=".UserHomeScreen.UserHomeScreen"
-            android:label="@string/title_activity_user_home_screen"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:name=".Activities.Login"
+            android:noHistory="true"
+            android:label="@string/title_activity_user_home_screen" />
         <activity
             android:name=".TestHomeScreen"
-            android:label="@string/title_activity_test_home_screen"
+            android:label="@string/title_activity_main_hub"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".MainHub"></activity>
+        <activity
+            android:name=".UserMatches"
+            android:label="@string/title_activity_user_matches"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

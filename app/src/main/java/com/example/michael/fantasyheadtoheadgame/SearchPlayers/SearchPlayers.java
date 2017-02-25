@@ -88,30 +88,36 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
         EditText webName = (EditText)findViewById(R.id.xmlSecondNameQuery);
         String fnStr = firstName.getText().toString();
         String wnStr = webName.getText().toString();
-
         SearchPlayerHttpRequest searchPlayersReq;
-        if(!fnStr.equals("")){
-             searchPlayersReq = new SearchPlayerHttpRequest(this,wnStr,fnStr);
-        }else{
-             searchPlayersReq = new SearchPlayerHttpRequest(this,wnStr);
-        }
-
-
-       
-        searchPlayersReq.delegate = this;
-        searchPlayersReq.execute();
         
+        //Checking serach queries arent empty
+        if(fnStr.isEmpty() && wnStr.isEmpty()){
+            displayToast("Please enter a search query");
+        }else{
+            if(fnStr.isEmpty()){
+                searchPlayersReq = new SearchPlayerHttpRequest(this,wnStr);
+            }else{
+                searchPlayersReq = new SearchPlayerHttpRequest(this,wnStr,fnStr);
+            }
+            searchPlayersReq.delegate = this;
+            searchPlayersReq.execute();
+        }
+    }
+
+    private void displayToast(String message){
+        Toast.makeText(this, message,
+                Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void processFinish(ArrayList<Player> players){
         searchResults = players;
         ArrayList<String> playersNames = new ArrayList<>();
+        //playersNames.add(0,"Cost"+"\t\t\t\t||\t\t\t\t"+"Player Name");
         
         for(Player p: players){
-            playersNames.add(p.getFirstName() +" "+ p.getSecondName());
+            playersNames.add(p.getCost()+"\t\t\t\t  \t\t\t\t"+p.getFirstName() +" "+ p.getSecondName());
         }
-
         
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
@@ -126,5 +132,15 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
     public void processUserUpdate(String result) {
         Toast.makeText(getApplicationContext(),"Player Added to team",
                 Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void processUserMatches(ArrayList<User> users) {
+
+    }
+
+    @Override
+    public void processLogin(User user) {
+        
     }
 }

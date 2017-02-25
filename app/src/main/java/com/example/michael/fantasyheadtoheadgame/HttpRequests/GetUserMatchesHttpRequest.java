@@ -5,31 +5,27 @@ import android.content.Context;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 
-import com.example.michael.fantasyheadtoheadgame.Activities.Login;
+import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 
 /**
- * Created by michaelgeehan on 10/02/2017.
+ * Created by michaelgeehan on 18/02/2017.
  */
 
-public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
+public class GetUserMatchesHttpRequest extends AsyncTask<Void, Void, ArrayList<User>> {
     public UserTeamAsyncResponse delegate = null;
     String URL;
     AndroidHttpClient mClient = AndroidHttpClient.newInstance("");
@@ -37,32 +33,18 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
     Context mainContext;
     ProgressDialog asyncDialog;
 
-    //user details
-    String userName,userPass;
 
-    public LoginHttpRequest(Context context,String username,String password){
+
+    public GetUserMatchesHttpRequest(Context context, int userID){
         this.mainContext = context;
-        this.userName = username;
-        this.userPass = password;
-        this.URL = addLoginToUrl("http://10.0.2.2:8888/login.php",username,password);
+        this.URL = "http://10.0.2.2:8888/GetUserMatches.php?userID="+userID;
     }
 
-    protected String addLoginToUrl(String url,String userName,String password){
-        if(!url.endsWith("?")){
-            url += "?";
-            List<NameValuePair> params = new LinkedList<NameValuePair>();
-            params.add(new BasicNameValuePair("userN",userName));
-            params.add(new BasicNameValuePair("password",password));
-            String paramString = URLEncodedUtils.format(params, "utf-8");
-            url += paramString;
-        }
-        return url;
-    }
 
     @Override
-    protected User doInBackground(Void... params) {
+    protected ArrayList<User> doInBackground(Void... params) {
         HttpGet request = new HttpGet(URL);
-        LoginHttpRequest.JSONResponseHandler responseHandler = new LoginHttpRequest.JSONResponseHandler();
+        GetUserMatchesHttpRequest.JSONResponseHandler responseHandler = new GetUserMatchesHttpRequest.JSONResponseHandler();
         try {
 
             return mClient.execute(request, responseHandler);
@@ -78,50 +60,63 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
     @Override
     protected void onPreExecute() {
         asyncDialog = new ProgressDialog(mainContext);
-        asyncDialog.setMessage("Logging In");
+        asyncDialog.setMessage("Searching");
         asyncDialog.show();
     }
 
     @Override
-    protected void onPostExecute(User userObj) {
+    protected void onPostExecute(ArrayList<User> users) {
+
         asyncDialog.dismiss();
         mClient.close();
-       // Login.onBackgroundTaskDataObtained(userObj);
-        delegate.processLogin(userObj);
+       // delegate.processFinish(players);
+        delegate.processUserMatches(users);
 
     }
 
 
 
-    private class JSONResponseHandler implements ResponseHandler<User> {
+    private class JSONResponseHandler implements ResponseHandler<ArrayList<User>> {
 
 
         @Override
-        public User handleResponse(HttpResponse response)
+        public ArrayList<User> handleResponse(HttpResponse response)
                 throws ClientProtocolException, IOException {
 
             String JSONResponse = new BasicResponseHandler()
                     .handleResponse(response);
 
+            // JSONResponse = JSONResponse.replace("\\u","");
+
+            
+
+            ArrayList<User> users = new ArrayList<User>();
             User userObj = null;
             JSONObject obj = null;
+            boolean canAdd = true;
             try {
                 obj = new JSONObject(JSONResponse);
-                JSONArray geodata = obj.getJSONArray("Users");
+                JSONArray geodata = obj.getJSONArray("users");
                 int n = geodata.length();
 
                 for (int i = 0; i < n; ++i) {
-                    final JSONObject user = geodata.getJSONObject(i);
-                    userObj = new User(user.getString("username"),user.getString("email"),user.getInt("ID"));
+                    canAdd = true;
+                    final JSONObject user1 = geodata.getJSONObject(i);
+                    userObj = new User(user1.getString("username"),"",0);
+                    users.add(userObj);
+                    
                 }
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return userObj;
+
+
+            return users;
         }
 
 
     }
 
 }
+

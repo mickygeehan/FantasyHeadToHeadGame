@@ -1,6 +1,7 @@
 package com.example.michael.fantasyheadtoheadgame.Interfaces;
 
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
+import com.example.michael.fantasyheadtoheadgame.Classes.User;
 
 import java.util.ArrayList;
 
@@ -11,4 +12,6 @@ import java.util.ArrayList;
 public interface UserTeamAsyncResponse {
     void processFinish(ArrayList<Player> players);
     void processUserUpdate(String result);
+    void processUserMatches(ArrayList<User> users);
+    void processLogin(User user);
 }

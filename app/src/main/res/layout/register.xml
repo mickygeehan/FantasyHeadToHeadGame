@@ -108,6 +108,7 @@
         android:layout_height="wrap_content"
         android:text="Already registered? Click here!"
         android:layout_marginTop="15dp"
+        android:onClick="gotoLogin"
         android:id="@+id/textView3"
         android:layout_below="@+id/button2"
         android:layout_centerHorizontal="true" />

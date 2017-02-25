@@ -10,17 +10,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="#097DC9">
-    
-    
-    <Button
-        android:text="Log In"
-        android:onClick="logIn"
-        android:layout_width="300dp"
-        android:layout_height="60dp"
-        android:id="@+id/button"
-        android:layout_marginTop="28dp"
-        android:layout_below="@+id/password"
-        android:layout_centerHorizontal="true" />
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -69,11 +59,29 @@
         android:textColorHint="#5e5b5b"
         android:ems="10"
         android:id="@+id/userName"
-        android:layout_marginTop="119dp"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/imageView8"
-        android:layout_alignRight="@+id/password"
-        android:layout_alignEnd="@+id/password" />
+        android:layout_marginTop="27dp"
+        android:layout_below="@+id/imageView"
+        android:layout_alignEnd="@+id/password"
+        android:layout_toEndOf="@+id/imageView8" />
 
-   
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/fantasy_showdon"
+        android:id="@+id/imageView"
+        android:layout_marginTop="64dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:text="Login"
+        android:onClick="logIn"
+        android:layout_width="300dp"
+        android:layout_height="60dp"
+        android:id="@+id/button"
+        android:layout_marginTop="23dp"
+        android:layout_below="@+id/password"
+        android:layout_alignParentEnd="true" />
+
+
 </RelativeLayout>

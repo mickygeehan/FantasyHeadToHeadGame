@@ -1,8 +1,8 @@
 package com.example.michael.fantasyheadtoheadgame;
 
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.michael.fantasyheadtoheadgame.Activities.Login;
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.FindHeadToHeadMatchHttpRequest;
@@ -23,9 +24,7 @@ import com.example.michael.fantasyheadtoheadgame.HttpRequests.GetUserTeamHttpReq
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.UpdateUserTeamHttpResponse;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 import com.example.michael.fantasyheadtoheadgame.SearchPlayers.SearchPlayers;
-import com.example.michael.fantasyheadtoheadgame.UserHomeScreen.UserHomeScreen;
-
-import org.w3c.dom.Text;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +40,7 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
     private ArrayList<String> subOptions;
     //num of players in pos
     private int numDef,numMid,numAtt = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +62,29 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
         //get user
         User user = (User) getIntent().getSerializableExtra("UserClass");
         u = user;
+
+
+        callGetUserTeam(u.getId());
+
         
-        //initialise all fields
-        callGetUserTeam(user.getId());
+        
+
     }
+
     
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        
+        callGetUserTeam(u.getId());
+        
+        
+
+        
+    }
+
+
     private void sortPlayerNames(){
         //sort them
 
@@ -97,7 +115,6 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
         
     }
     
-    
     private void callGetUserTeam(int userID){
         GetUserTeamHttpRequest getWeeklyTeam = new GetUserTeamHttpRequest(this,userID);
         getWeeklyTeam.delegate = this;
@@ -118,7 +135,6 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
         findH2H.execute();
     }
     
-
     private void initialiseFields(){
         TextView player1Label = (TextView)findViewById(R.id.xmlPlayer1Name);
         TextView player2Label = (TextView)findViewById(R.id.xmlPlayer2Name);
@@ -150,8 +166,8 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
     public void processFinish(ArrayList<Player> players) {
         //initialise variables
         playersInTeam = players;
-        playersNames = new ArrayList<String>();
-        playerMap = new HashMap<String,Player>();
+        playersNames = new ArrayList<>();
+        playerMap = new HashMap<>();
         subOptions = new ArrayList<>();
 
         for(Player p: players){
@@ -174,6 +190,16 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
     public void processUserUpdate(String result) {
         Toast.makeText(getApplicationContext(),result,
                 Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void processUserMatches(ArrayList<User> users) {
+        
+    }
+
+    @Override
+    public void processLogin(User user) {
+        
     }
 
     public void changePlayer(View view){
@@ -243,8 +269,6 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
                 selectedPlayer = playerMap.get(playerLabel.getText().toString());
                 break;
         }
-        
-        
         
         //clear old sub options and get new ones for new player
         subOptions.clear();

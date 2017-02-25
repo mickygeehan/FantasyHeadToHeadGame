@@ -25,7 +25,7 @@ import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncRespons
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class UserHomeScreen extends AppCompatActivity implements UserTeamAsyncResponse {
+public abstract class UserHomeScreen extends AppCompatActivity implements UserTeamAsyncResponse {
 
     private Context context;
     private Spinner weeklyTeamSpinner;

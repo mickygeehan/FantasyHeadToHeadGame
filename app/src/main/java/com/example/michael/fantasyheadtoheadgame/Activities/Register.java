@@ -2,6 +2,7 @@ package com.example.michael.fantasyheadtoheadgame.Activities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -16,10 +17,15 @@ import com.example.michael.fantasyheadtoheadgame.R;
 
 public class Register extends Activity {
     private static Context context;
+    
+    //Error labels
+    private final String userNameEmpty = "Please enter a username!";
+    private final String passwordEmpty = "Please enter a password!";
+    private final String emailEmpty = "Please enter an email!";
+    private final String fullNameEmpty = "Please enter a name!";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
         context = Register.this;
@@ -37,44 +43,64 @@ public class Register extends Activity {
         String fullName = fullNameEditText.getText().toString();
         String password1 = password1EditText.getText().toString();
         String password2 = password2EditText.getText().toString();
-
-        //check that passwords are the same
-        if(passwordsMatch(password1,password2)){
-
-           // check email is in right format
-             //if(emailPatterCheck(email)) {
-
-            //Call a register request
-            RegisterHttpRequest reg = new RegisterHttpRequest(context,userName,password1,email,fullName);
-            reg.execute();
-
-           //  }else{
-
-           // }
-
-        }else{
-            Toast.makeText(Register.this,"Password's do not match!",
-                    Toast.LENGTH_LONG).show();
+        
+        if(checkFields(userName,email,fullName,password1,password2)){
+            if(passwordsMatch(password1,password2)){
+                RegisterHttpRequest reg = new RegisterHttpRequest(context,userName,password1,email,fullName);
+                reg.execute();
+            }else{
+                displayToast("Password's do not match!");
+            }
         }
+
+    }
+    
+    private boolean checkFields(String userName,String email,String fullName,String password1,String password2){
+        if(userName.isEmpty()){
+            displayToast(userNameEmpty);
+            return false;
+        }else if(email.isEmpty()){
+            displayToast(emailEmpty);
+            return false;
+        }else if(fullName.isEmpty()){
+            displayToast(fullNameEmpty);
+            return false;
+        }else if(password1.isEmpty()){
+            displayToast(passwordEmpty);
+            return false;
+        }else if(password2.isEmpty()){
+            displayToast(passwordEmpty);
+            return false;
+        }
+        return true;
     }
 
+    private void displayToast(String message){
+        Toast.makeText(this, message,
+                Toast.LENGTH_LONG).show();
+    }
+    
+    public void gotoLogin(View view){
+        Intent i = new Intent(this,Login.class);
+        startActivity(i);
+        finish();
+    }
+    
+    
     private boolean passwordsMatch(String pass1,String pass2){
-        if(pass1.equals(pass2)){
-            return true;
-        }
-        return false;
+        return pass1.equals(pass2);
     }
-
-    private boolean emailPatterCheck(String email){
-
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
-
 
     //Data back from RegisterHttpRequest
     public static void onBackgroundTaskDataObtained(String result) {
-        Toast.makeText(context,result,
-                Toast.LENGTH_LONG).show();
+        if(result == null){
+            Toast.makeText(context,"Server Issue",
+                    Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(context,result,
+                    Toast.LENGTH_LONG).show();
+        }
+        
 
 
     }
