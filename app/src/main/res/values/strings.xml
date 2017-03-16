@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Fantasy Head To Head Game</string>
+    <string name="app_name">Fantasy Showdown</string>
     <string name="title_activity_search_players">SearchPlayers</string>
     <string name="title_activity_login">Login</string>
     <string name="title_activity_user_home_screen">UserHomeScreen</string>
     <string name="title_activity_test_home_screen">TestHomeScreen</string>
-    <string name="title_activity_main_hub">MainHub</string>
+    <string name="title_activity_main_hub">Team</string>
     <string name="title_activity_user_matches">UserMatches</string>
 </resources>

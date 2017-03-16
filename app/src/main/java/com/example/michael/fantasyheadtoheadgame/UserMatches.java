@@ -16,6 +16,7 @@ import com.example.michael.fantasyheadtoheadgame.HttpRequests.GetUserMatchesHttp
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class UserMatches extends AppCompatActivity implements UserTeamAsyncResponse {
     
@@ -23,6 +24,8 @@ public class UserMatches extends AppCompatActivity implements UserTeamAsyncRespo
     private ArrayList<User> matchedUsers;
     private ArrayList<String> matchedUsersAdap = new ArrayList<>();
     private String username;
+    private HashMap<String,User> matches = new HashMap<>();
+    private User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +46,7 @@ public class UserMatches extends AppCompatActivity implements UserTeamAsyncRespo
         lv = (ListView)findViewById(R.id.xmlUMlistview);
         User user = (User) getIntent().getSerializableExtra("UserClass");
         username = user.getUsername();
-        GetUserMatchesHttpRequest getMatches = new GetUserMatchesHttpRequest(UserMatches.this,user.getId());
+        GetUserMatchesHttpRequest getMatches = new GetUserMatchesHttpRequest(UserMatches.this,user.getId(),user.getUsername());
         getMatches.delegate = this;
         getMatches.execute();
     }
@@ -60,15 +63,33 @@ public class UserMatches extends AppCompatActivity implements UserTeamAsyncRespo
 
     @Override
     public void processUserMatches(ArrayList<User> users) {
-        matchedUsers = users;
-        for(User u: matchedUsers){
-            matchedUsersAdap.add(u.getUsername() +" VS "+ username);
+//        currentUser = new User(username,"",0,0,0);
+//
+//        for(User u: users){
+//            System.out.println(u.getUsername()+u.getPoints());
+//            matchedUsersAdap.add(currentUser.getPoints()+" "+currentUser.getUsername()+" VS "+u.getUsername()+" "+u.getPoints());
+//        }
+        
+        
+        //display all results
+        for(int i =0;i<users.size()-1;i++){
+            matchedUsersAdap.add(users.get(i).getUsername()+" "+ users.get(i).getPoints() + " - "+ users.get(i+1).getPoints()
+                    +" "+ users.get(i+1).getUsername());
+            i++;
         }
+//        matchedUsers = users;
+//        for(User u: users){
+//            if(u != null){
+//                matches.put(u.getUsername(),u);
+//                matchedUsersAdap.add(u.getUsername() +" "+u.getPoints()+" VS "+matches.get(username).getPoints()+" "+ username);
+//            }
+//            
+//        }
 
         if(matchedUsersAdap.size() > 0) {
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                     this,
-                    android.R.layout.simple_list_item_1,
+                    R.layout.mylist,
                     matchedUsersAdap);
 
             lv.setAdapter(arrayAdapter);

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 
-import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 
@@ -35,9 +34,10 @@ public class GetUserMatchesHttpRequest extends AsyncTask<Void, Void, ArrayList<U
 
 
 
-    public GetUserMatchesHttpRequest(Context context, int userID){
+    public GetUserMatchesHttpRequest(Context context, int userID, String userName){
         this.mainContext = context;
-        this.URL = "http://10.0.2.2:8888/GetUserMatches.php?userID="+userID;
+       this.URL = "http://10.0.2.2:8888/FantasyShowDown/GetUserMatches.php?userID="+userID+"&username="+userName;
+     //   this.URL = "http://10.102.10.146:8888/FantasyShowDown/GetUserMatches.php?userID="+userID+"&username="+userName;
     }
 
 
@@ -70,6 +70,7 @@ public class GetUserMatchesHttpRequest extends AsyncTask<Void, Void, ArrayList<U
         asyncDialog.dismiss();
         mClient.close();
        // delegate.processFinish(players);
+
         delegate.processUserMatches(users);
 
     }
@@ -86,7 +87,7 @@ public class GetUserMatchesHttpRequest extends AsyncTask<Void, Void, ArrayList<U
             String JSONResponse = new BasicResponseHandler()
                     .handleResponse(response);
 
-            // JSONResponse = JSONResponse.replace("\\u","");
+
 
             
 
@@ -102,7 +103,7 @@ public class GetUserMatchesHttpRequest extends AsyncTask<Void, Void, ArrayList<U
                 for (int i = 0; i < n; ++i) {
                     canAdd = true;
                     final JSONObject user1 = geodata.getJSONObject(i);
-                    userObj = new User(user1.getString("username"),"",0);
+                    userObj = new User(user1.getString("username"),"",0,0,user1.getInt("points"));
                     users.add(userObj);
                     
                 }

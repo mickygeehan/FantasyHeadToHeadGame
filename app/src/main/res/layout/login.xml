@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_main2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -22,31 +20,15 @@
         android:layout_below="@+id/button"
         android:layout_centerHorizontal="true" />
 
-    <ImageView
-        android:src="@android:drawable/ic_lock_lock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView8"
-        android:layout_alignTop="@+id/password"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
 
-    <EditText
+    <ImageView
         android:layout_width="wrap_content"
-        android:background="#FFFFFF"
         android:layout_height="wrap_content"
-        android:padding="6dp"
-        android:inputType="textPassword"
-        android:hint="Password"
-        android:textColor="#5e5b5b"
-        android:textColorHint="#5e5b5b"
-        android:ems="10"
-        android:id="@+id/password"
-        android:layout_marginTop="11dp"
-        android:layout_below="@+id/userName"
-        android:layout_toRightOf="@+id/imageView8"
-        android:layout_alignRight="@+id/button"
-        android:layout_alignEnd="@+id/button" />
+        android:src="@drawable/fantasy_showdon"
+        android:id="@+id/imageView"
+        android:layout_marginTop="64dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -61,17 +43,25 @@
         android:id="@+id/userName"
         android:layout_marginTop="27dp"
         android:layout_below="@+id/imageView"
-        android:layout_alignEnd="@+id/password"
-        android:layout_toEndOf="@+id/imageView8" />
+        android:layout_alignEnd="@+id/button"
+        android:layout_alignStart="@+id/button" />
 
-    <ImageView
+    <EditText
         android:layout_width="wrap_content"
+        android:background="#FFFFFF"
         android:layout_height="wrap_content"
-        android:src="@drawable/fantasy_showdon"
-        android:id="@+id/imageView"
-        android:layout_marginTop="64dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:padding="6dp"
+        android:inputType="textPassword"
+        android:hint="Password"
+        android:textColor="#5e5b5b"
+        android:textColorHint="#5e5b5b"
+        android:ems="10"
+        android:id="@+id/password"
+        android:layout_marginTop="9dp"
+
+        android:layout_below="@+id/userName"
+        android:layout_alignStart="@+id/userName"
+        android:layout_alignEnd="@+id/userName" />
 
     <Button
         android:text="Login"
@@ -79,9 +69,9 @@
         android:layout_width="300dp"
         android:layout_height="60dp"
         android:id="@+id/button"
-        android:layout_marginTop="23dp"
+        android:layout_marginTop="16dp"
         android:layout_below="@+id/password"
-        android:layout_alignParentEnd="true" />
+        android:layout_centerHorizontal="true" />
 
 
 </RelativeLayout>

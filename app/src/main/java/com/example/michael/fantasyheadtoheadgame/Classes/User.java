@@ -8,13 +8,28 @@ import java.io.Serializable;
 
 public class User implements Serializable {
     private String username,email;
-    private int id;
+    private int id,budget,points;
 
+    public User(String username, String email, int id, int budget) {
+        this.username = username;
+        this.email = email;
+        this.id = id;
+        this.budget = budget;
+    }
     public User(String username, String email, int id) {
         this.username = username;
         this.email = email;
         this.id = id;
+
     }
+    public User(String username, String email, int id, int budget,int points) {
+        this.username = username;
+        this.email = email;
+        this.id = id;
+        this.budget = budget;
+        this.points = points;
+    }
+
 
 
     public String getUsername() {
@@ -40,4 +55,21 @@ public class User implements Serializable {
     public void setId(int id) {
         this.id = id;
     }
+
+    public int getBudget() {
+        return budget;
+    }
+
+    public void setBudget(int budget) {
+        this.budget = budget;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
 }

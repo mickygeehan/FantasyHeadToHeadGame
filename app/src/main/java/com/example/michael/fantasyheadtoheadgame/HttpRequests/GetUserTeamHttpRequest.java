@@ -36,7 +36,9 @@ public class GetUserTeamHttpRequest extends AsyncTask<Void, Void, ArrayList<Play
 
     public GetUserTeamHttpRequest(Context context, int id){
         this.mainContext = context;
-        this.URL = "http://10.0.2.2:8888/GetUserTeam.php?userID="+id;
+      this.URL = "http://10.0.2.2:8888/FantasyShowDown/GetUserTeam.php?userID="+id;
+      //  this.URL = "http://10.102.10.146:8888/FantasyShowDown/GetUserTeam.php?userID="+id;
+
     }
 
 

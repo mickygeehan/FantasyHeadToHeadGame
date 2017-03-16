@@ -40,7 +40,7 @@ public class Register extends Activity {
 
         String userName = userNameEditText.getText().toString();
         String email = emailEditText.getText().toString();
-        String fullName = fullNameEditText.getText().toString();
+        String fullName = fullNameEditText.getText().toString().replace(" ","+");
         String password1 = password1EditText.getText().toString();
         String password2 = password2EditText.getText().toString();
         

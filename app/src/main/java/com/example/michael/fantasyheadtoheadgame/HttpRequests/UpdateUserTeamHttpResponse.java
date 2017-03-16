@@ -33,7 +33,8 @@ public class UpdateUserTeamHttpResponse extends AsyncTask<Object, Object, String
 
     public UpdateUserTeamHttpResponse(Context context,String urlToAdd){
         this.mainContext = context;
-        this.URL = "http://10.0.2.2:8888/UpdateUserTeam.php"+urlToAdd;
+        this.URL = "http://10.0.2.2:8888/FantasyShowDown/UpdateUserTeam.php"+urlToAdd;
+       //this.URL = "http://10.102.10.146:8888/FantasyShowDown/UpdateUserTeam.php"+urlToAdd;
         System.out.println(URL);
     }
 

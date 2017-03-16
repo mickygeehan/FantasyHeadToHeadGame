@@ -4,6 +4,7 @@ package com.example.michael.fantasyheadtoheadgame.SearchPlayers;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +32,7 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
     ArrayList<Player> searchResults;
     ListView searchResultsLv;
     int sizeOfTeam = 0;
+    int budget = 0;
     
 
     @Override
@@ -41,6 +43,7 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
         
         final int numPlayers = (int) getIntent().getSerializableExtra("numberPlayers");
         final int userID = (int)getIntent().getSerializableExtra("userID");
+        budget =  (int)getIntent().getSerializableExtra("budget");
         sizeOfTeam = numPlayers;
         final ContextThemeWrapper ct = new ContextThemeWrapper(this, R.style.myDialog);
         
@@ -60,14 +63,23 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
                             .setPositiveButton("Buy", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     // continue with buy
-                                    int playerId = searchResults.get(itemPosition).getId();
-                                    int playerPositionInTeam = sizeOfTeam +1;
-                                    String url = "?player"+playerPositionInTeam+"="+playerId+"&userID="+userID;
-                                    System.out.println(url);
-                                    UpdateUserTeamHttpResponse getWeeklyTeam = new UpdateUserTeamHttpResponse(SearchPlayers.this,url);
-                                    getWeeklyTeam.delegate = SearchPlayers.this;
-                                    getWeeklyTeam.execute();
-                                    sizeOfTeam = sizeOfTeam +1;
+                                    System.out.println(budget);
+                                    System.out.println(searchResults.get(itemPosition).getCost());
+                                    if(budget >= searchResults.get(itemPosition).getCost()){
+                                        int playerId = searchResults.get(itemPosition).getId();
+                                        int playerPositionInTeam = sizeOfTeam +1;
+                                        String url = "?player"+playerPositionInTeam+"="+playerId+"&userID="+userID;
+                                        System.out.println(url);
+                                        UpdateUserTeamHttpResponse getWeeklyTeam = new UpdateUserTeamHttpResponse(SearchPlayers.this,url);
+                                        getWeeklyTeam.delegate = SearchPlayers.this;
+                                        getWeeklyTeam.execute();
+                                        sizeOfTeam = sizeOfTeam +1;
+                                        budget = (int) (budget - searchResults.get(itemPosition).getCost());
+           
+                                    }else{
+                                        Toast.makeText(getApplicationContext(),"Not enough money",Toast.LENGTH_LONG).show();
+                                    }
+                                   
                                 }
                             })
                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -110,21 +122,33 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
     }
 
     @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        Intent i = new Intent();
+        i.putExtra("budget", budget);
+        setResult(RESULT_OK, i);
+        finish();
+    }
+    
+    @Override
     public void processFinish(ArrayList<Player> players){
         searchResults = players;
         ArrayList<String> playersNames = new ArrayList<>();
         //playersNames.add(0,"Cost"+"\t\t\t\t||\t\t\t\t"+"Player Name");
         
-        for(Player p: players){
-            playersNames.add(p.getCost()+"\t\t\t\t  \t\t\t\t"+p.getFirstName() +" "+ p.getSecondName());
+        if(players != null){
+            for(Player p: players){
+                playersNames.add(p.getCost()+"\t\t\t\t  \t\t\t\t"+p.getFirstName() +" "+ p.getSecondName());
+            }
+
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                    this,
+                    android.R.layout.simple_list_item_1,
+                    playersNames );
+
+            searchResultsLv.setAdapter(arrayAdapter);
         }
-        
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_list_item_1,
-                playersNames );
-        
-        searchResultsLv.setAdapter(arrayAdapter);
+       
         
     }
 

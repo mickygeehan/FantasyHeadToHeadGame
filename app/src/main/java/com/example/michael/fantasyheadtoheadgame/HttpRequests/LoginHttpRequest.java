@@ -30,6 +30,7 @@ import java.util.List;
  */
 
 public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
+    
     public UserTeamAsyncResponse delegate = null;
     String URL;
     AndroidHttpClient mClient = AndroidHttpClient.newInstance("");
@@ -44,7 +45,8 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
         this.mainContext = context;
         this.userName = username;
         this.userPass = password;
-        this.URL = addLoginToUrl("http://10.0.2.2:8888/login.php",username,password);
+       this.URL = addLoginToUrl("http://10.0.2.2:8888/FantasyShowDown/login.php",username,password);
+        //this.URL = addLoginToUrl("http://10.102.10.146:8888/FantasyShowDown/login.php",username,password);
     }
 
     protected String addLoginToUrl(String url,String userName,String password){
@@ -112,7 +114,7 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
 
                 for (int i = 0; i < n; ++i) {
                     final JSONObject user = geodata.getJSONObject(i);
-                    userObj = new User(user.getString("username"),user.getString("email"),user.getInt("ID"));
+                    userObj = new User(user.getString("username"),user.getString("email"),user.getInt("ID"),user.getInt("budget"));
                 }
 
             } catch (JSONException e) {

@@ -1,5 +1,6 @@
 package com.example.michael.fantasyheadtoheadgame;
 
+import android.app.ActionBar;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +22,7 @@ import com.example.michael.fantasyheadtoheadgame.Activities.Login;
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.FindHeadToHeadMatchHttpRequest;
+import com.example.michael.fantasyheadtoheadgame.HttpRequests.GetBudgetHTTPRequest;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.GetUserTeamHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.UpdateUserTeamHttpResponse;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
@@ -40,6 +43,7 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
     private ArrayList<String> subOptions;
     //num of players in pos
     private int numDef,numMid,numAtt = 0;
+    private int budget = 0;
 
 
     @Override
@@ -55,24 +59,26 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
             public void onClick(View view) {
                 Snackbar.make(view, "Saved your team", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                updateUserTeamInDB();
+                updateUserTeamInDB(u.getBudget());
             }
         });
         
         //get user
         User user = (User) getIntent().getSerializableExtra("UserClass");
         u = user;
-
-
+        
+        //getSupportActionBar().setTitle("Your Team \t\tBudget: "+u.getBudget());
+        getBudget();
         callGetUserTeam(u.getId());
 
-        
-        
-
     }
-
     
-
+    private void getBudget(){
+        GetBudgetHTTPRequest getBudget = new GetBudgetHTTPRequest(this,u.getId());
+        getBudget.delegate = this;
+        getBudget.execute();
+    }
+    
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -84,6 +90,11 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
         
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        
+    }
 
     private void sortPlayerNames(){
         //sort them
@@ -126,9 +137,23 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
         Intent intent = new Intent(TestHomeScreen.this, SearchPlayers.class);
         intent.putExtra("numberPlayers", playersInTeam.size());
         intent.putExtra("userID", u.getId());
-        startActivity(intent);
+        intent.putExtra("budget", u.getBudget());
+        startActivityForResult(intent,1);
     }
-    
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if(resultCode == RESULT_OK) {
+                int updateBudget=data.getIntExtra("budget",0);
+                u.setBudget(updateBudget);
+                updateUserTeamInDB(u.getBudget());
+                getSupportActionBar().setTitle("Your Team \t\tBudget: "+u.getBudget());
+            }
+        }
+    }
+
     public void findHeadToHead(View view){
         FindHeadToHeadMatchHttpRequest findH2H = new FindHeadToHeadMatchHttpRequest(TestHomeScreen.this,u.getId(),u.getUsername());
         findH2H.delegate = this;
@@ -188,8 +213,19 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
 
     @Override
     public void processUserUpdate(String result) {
-        Toast.makeText(getApplicationContext(),result,
-                Toast.LENGTH_LONG).show();
+        if(result != ""){
+            try {
+                budget = Integer.valueOf(result);
+                u.setBudget(budget);
+                getSupportActionBar().setTitle("Your Team \t\tBudget: "+budget);
+            } catch(NumberFormatException e) {
+                Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
+            } catch(NullPointerException e) {
+                
+            }
+        }
+       
+        
     }
 
     @Override
@@ -217,56 +253,59 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
                 selectedPlayer = playerMap.get(playerLabel.getText().toString());
                 break;
 
-            case R.id.xmlchangePlayer2Bt:
+            case R.id.imageButton4:
                 // Code for button 2 click
                 playerLabel = (TextView)findViewById(R.id.xmlPlayer2Name);
                 selectedPlayer = playerMap.get(playerLabel.getText().toString());
                 break;
 
-            case R.id.xmlchangePlayer3Bt:
+            case R.id.imageButton5:
                 // Code for button 3 click
                 playerLabel = (TextView)findViewById(R.id.xmlPlayer3Name);
                 selectedPlayer = playerMap.get(playerLabel.getText().toString());
                 break;
-            case R.id.xmlchangePlayer4Bt:
+            case R.id.imageButton6:
                 // Code for button 3 click
                 playerLabel = (TextView)findViewById(R.id.xmlPlayer4Name);
                 selectedPlayer = playerMap.get(playerLabel.getText().toString());
                 break;
-            case R.id.xmlchangePlayer5Bt:
+            case R.id.imageButton7:
                 // Code for button 3 click
                 playerLabel = (TextView)findViewById(R.id.xmlPlayer5Name);
                 selectedPlayer = playerMap.get(playerLabel.getText().toString());
                 break;
-            case R.id.xmlchangePlayer6Bt:
+            case R.id.imageButton8:
                 // Code for button 3 click
                 playerLabel = (TextView)findViewById(R.id.xmlPlayer6Name);
                 selectedPlayer = playerMap.get(playerLabel.getText().toString());
                 break;
-            case R.id.xmlchangePlayer7Bt:
+            case R.id.imageButton9:
                 // Code for button 3 click
                 playerLabel = (TextView)findViewById(R.id.xmlPlayer7Name);
                 selectedPlayer = playerMap.get(playerLabel.getText().toString());
                 break;
-            case R.id.xmlchangePlayer8Bt:
+            case R.id.imageButton10:
                 // Code for button 3 click
                 playerLabel = (TextView)findViewById(R.id.xmlPlayer8Name);
                 selectedPlayer = playerMap.get(playerLabel.getText().toString());
                 break;
-            case R.id.xmlchangePlayer9Bt:
+            case R.id.imageButton11:
                 // Code for button 3 click
                 playerLabel = (TextView)findViewById(R.id.xmlPlayer9Name);
                 selectedPlayer = playerMap.get(playerLabel.getText().toString());
                 break;
-            case R.id.xmlchangePlayer10Bt:
+            case R.id.imageButton12:
                 // Code for button 3 click
                 playerLabel = (TextView)findViewById(R.id.xmlPlayer10Name);
                 selectedPlayer = playerMap.get(playerLabel.getText().toString());
                 break;
-            case R.id.xmlchangePlayer11Bt:
+            case R.id.imageButton13:
                 // Code for button 3 click
                 playerLabel = (TextView)findViewById(R.id.xmlPlayer11Name);
                 selectedPlayer = playerMap.get(playerLabel.getText().toString());
+                System.out.println(playerMap.get(playerLabel.getText().toString()).getTeamCode());
+//                ImageButton im = (ImageButton)findViewById(R.id.imageButton13);
+//                im.setImageResource(R.drawable.man_city);
                 break;
         }
         
@@ -348,8 +387,8 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
         playerLabel.setText(playerName);
     }
 
-    public void updateUserTeamInDB(){
-
+    public void updateUserTeamInDB(int budget){
+        
         sortPlayerNames();
         String url = "?";
         int i = 1;
@@ -359,7 +398,7 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
             url = url + "player"+i+"="+pl.getId()+"&";
             i++;
         }
-        url = url+"userID="+u.getId();
+        url = url+"userID="+u.getId()+"&budget="+budget;
 
         UpdateUserTeamHttpResponse getWeeklyTeam = new UpdateUserTeamHttpResponse(TestHomeScreen.this,url);
         getWeeklyTeam.delegate = this;
