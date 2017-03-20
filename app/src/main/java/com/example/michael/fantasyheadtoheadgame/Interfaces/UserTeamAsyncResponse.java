@@ -14,4 +14,6 @@ public interface UserTeamAsyncResponse {
     void processUserUpdate(String result);
     void processUserMatches(ArrayList<User> users);
     void processLogin(User user);
+    void processInvites(String sentBy);
+    void processDate(String epochDate);
 }

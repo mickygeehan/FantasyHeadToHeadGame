@@ -138,7 +138,7 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
         
         if(players != null){
             for(Player p: players){
-                playersNames.add(p.getCost()+"\t\t\t\t  \t\t\t\t"+p.getFirstName() +" "+ p.getSecondName());
+                playersNames.add("€"+p.getCost()+"\t\t\t\t  \t\t\t\t"+p.getFirstName() +" "+ p.getSecondName());
             }
 
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
@@ -165,6 +165,16 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
 
     @Override
     public void processLogin(User user) {
+        
+    }
+
+    @Override
+    public void processInvites(String sentBy) {
+        
+    }
+
+    @Override
+    public void processDate(String epochDate) {
         
     }
 }

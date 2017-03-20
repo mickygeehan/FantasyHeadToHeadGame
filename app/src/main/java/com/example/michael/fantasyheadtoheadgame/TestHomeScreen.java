@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -22,8 +23,11 @@ import com.example.michael.fantasyheadtoheadgame.Activities.Login;
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.FindHeadToHeadMatchHttpRequest;
+import com.example.michael.fantasyheadtoheadgame.HttpRequests.FindInvitesHttprequest;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.GetBudgetHTTPRequest;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.GetUserTeamHttpRequest;
+import com.example.michael.fantasyheadtoheadgame.HttpRequests.ReplyToInviteHttpRequest;
+import com.example.michael.fantasyheadtoheadgame.HttpRequests.SendHeadToHeadInviteHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.UpdateUserTeamHttpResponse;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 import com.example.michael.fantasyheadtoheadgame.SearchPlayers.SearchPlayers;
@@ -68,10 +72,19 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
         u = user;
         
         //getSupportActionBar().setTitle("Your Team \t\tBudget: "+u.getBudget());
+        getHeadToHeadInvites(u.getUsername());
         getBudget();
         callGetUserTeam(u.getId());
 
     }
+    
+    private void getHeadToHeadInvites(String uName){
+        //checks if you have any head to head invites
+        FindInvitesHttprequest findIn = new FindInvitesHttprequest(this,u.getId(),u.getUsername());
+        findIn.delegate = this;
+        findIn.execute();
+    }
+    
     
     private void getBudget(){
         GetBudgetHTTPRequest getBudget = new GetBudgetHTTPRequest(this,u.getId());
@@ -155,9 +168,48 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
     }
 
     public void findHeadToHead(View view){
-        FindHeadToHeadMatchHttpRequest findH2H = new FindHeadToHeadMatchHttpRequest(TestHomeScreen.this,u.getId(),u.getUsername());
-        findH2H.delegate = this;
-        findH2H.execute();
+        final EditText input = new EditText(this);
+        input.setHint("Friends Username");
+        AlertDialog.Builder builder = new AlertDialog.Builder(TestHomeScreen.this);
+        builder.setView(input);
+        builder.setTitle("Find H2H Contest")
+                .setNeutralButton("Send Invite", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        SendHeadToHeadInviteHttpRequest sendH2HInvite = new SendHeadToHeadInviteHttpRequest(TestHomeScreen.this,u.getId(),u.getUsername(),input.getText().toString());
+                        sendH2HInvite.delegate = TestHomeScreen.this;
+                        sendH2HInvite.execute();
+                    }
+
+                })
+                .setPositiveButton("Random", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        FindHeadToHeadMatchHttpRequest findH2H = new FindHeadToHeadMatchHttpRequest(TestHomeScreen.this,u.getId(),u.getUsername());
+                        findH2H.delegate = TestHomeScreen.this;
+                        findH2H.execute();
+                    }
+
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+
+                });
+        builder.show();
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     }
     
     private void initialiseFields(){
@@ -184,9 +236,155 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
         player9Label.setText(playersNames.get(8));
         player10Label.setText(playersNames.get(9));
         player11Label.setText(playersNames.get(10));
+        
+        initialiseImages();
 
     }
+    
+    private void initialiseImages(){
+        
+        for(int i=1; i <=10;i++){
+            
+            Player p = playerMap.get(playersNames.get(i));
+            int playerTeam = p.getTeamCode();
+            setImage(playerTeam,i);
+            
+       
+        }
+        
+        
+    }
+    
+    private void setImage(int playerTeam,int posInTeam){
+        ImageButton im = null;
+        switch(playerTeam){
+            case 8:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.chelsea);
+                break;
+            case 91:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.bournmeth);
+                break;
+            case 3:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.arsenal);
+                break;
+            case 31:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.crystal_palace);
+                break;
+            case 11:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.everton);
+                break;
+            case 88:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.hull);
+                break;
+            case 13:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.leicester);
+                break;
+            case 14:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.liverpool);
+                break;
+            case 43:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.man_city);
+                break;
+            case 1:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.man_united);
+                break;
+            case 25:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.middlesborough);
+                break;
+            case 20:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.southampton);
+                break;
+            case 110:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.stoke);
+                break;
+            case 56:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.sunderland);
+                break;
+            case 80:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.swansea);
+                break;
+            case 6:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.tottenham);
+                break;
+            case 57:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.watford);
+                break;
+            case 35:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.west_brom);
+                break;
+            case 21:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.west_ham);
+                break;
+            case 90:
+                im = getImageButton(posInTeam);
+                im.setImageResource(R.drawable.burnley);
+                break;
+            default:
+                break;
+        }
+    }
+    
+    private ImageButton getImageButton(int posInTeam){
+        ImageButton im = null;
+        
+        switch(posInTeam){
+            case 1:
+                im = (ImageButton)findViewById(R.id.imageButton4);
+                break;
+            case 2:
+                im = (ImageButton)findViewById(R.id.imageButton5);
+                break;
+            case 3:
+                im = (ImageButton)findViewById(R.id.imageButton6);
+                break;
+            case 4:
+                im = (ImageButton)findViewById(R.id.imageButton7);
+                break;
+            case 5:
+                im = (ImageButton)findViewById(R.id.imageButton8);
+                break;
+            case 6:
+                im = (ImageButton)findViewById(R.id.imageButton9);
+                break;
+            case 7:
+                im = (ImageButton)findViewById(R.id.imageButton10);
+                break;
+            case 8:
+                im = (ImageButton)findViewById(R.id.imageButton11);
+                break;
+            case 9:
+                im = (ImageButton)findViewById(R.id.imageButton12);
+                break;
+            case 10:
+                im = (ImageButton)findViewById(R.id.imageButton13);
+                break;
+            default:
+                break;
 
+        }
+        
+        return im;
+    }
+    
     @Override
     public void processFinish(ArrayList<Player> players) {
         //initialise variables
@@ -235,6 +433,41 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
 
     @Override
     public void processLogin(User user) {
+        
+    }
+
+    @Override
+    public void processInvites(final String sentBy) {
+        if(sentBy.contains("You have no")){
+            Toast.makeText(this,sentBy,Toast.LENGTH_LONG).show();
+        }else{
+            AlertDialog.Builder builder = new AlertDialog.Builder(TestHomeScreen.this);
+            builder.setTitle("Received H2H Invite from: "+sentBy)
+
+                    .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ReplyToInviteHttpRequest replyH2H = new ReplyToInviteHttpRequest(TestHomeScreen.this,u.getId(),sentBy,u.getUsername());
+                            replyH2H.delegate = TestHomeScreen.this;
+                            replyH2H.execute();
+                        }
+
+                    })
+                    .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+
+                    });
+            builder.show();
+        }
+        
+    }
+
+    @Override
+    public void processDate(String epochDate) {
+        Long epoch = Long.getLong(epochDate);
         
     }
 
@@ -304,8 +537,7 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
                 playerLabel = (TextView)findViewById(R.id.xmlPlayer11Name);
                 selectedPlayer = playerMap.get(playerLabel.getText().toString());
                 System.out.println(playerMap.get(playerLabel.getText().toString()).getTeamCode());
-//                ImageButton im = (ImageButton)findViewById(R.id.imageButton13);
-//                im.setImageResource(R.drawable.man_city);
+//                
                 break;
         }
         
@@ -346,13 +578,16 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
                         playerName = (String) cs[which];
                         Player playerToSwap = playerMap.get(playerName);
                         int playerToSwapPosInTeam = playerToSwap.getPosInTeam();
+                        
+                        
+                        //ystem.out.println(currentPosInTeam+"-"+playerToSwapPosInTeam);
 
 
                         //setIDs
                         currentPlayer.setPosInTeam(playerToSwapPosInTeam);
                         playerToSwap.setPosInTeam(currentPosInTeam);
 
-                        updateLabelFieldsAfterSwap(playerLabel,playerToSwap.getWebName());
+                        updateLabelFieldsAfterSwap(playerLabel,playerToSwap.getWebName(),playerToSwap);
 
 
                         Toast.makeText(getApplicationContext(),"You have now subbed in this player!",
@@ -383,8 +618,12 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
         }
     }
     
-    private void updateLabelFieldsAfterSwap(TextView playerLabel, String playerName){
+    private void updateLabelFieldsAfterSwap(TextView playerLabel, String playerName,Player swappedPlayer){
         playerLabel.setText(playerName);
+        if(swappedPlayer.getPosInTeam()-1 >0){
+            setImage(swappedPlayer.getTeamCode(),swappedPlayer.getPosInTeam()-1);
+        }
+        
     }
 
     public void updateUserTeamInDB(int budget){

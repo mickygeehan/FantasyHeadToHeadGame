@@ -19,6 +19,9 @@ import com.example.michael.fantasyheadtoheadgame.MainHub;
 import com.example.michael.fantasyheadtoheadgame.R;
 import com.example.michael.fantasyheadtoheadgame.SessionManager;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 
@@ -78,7 +81,8 @@ public class Login extends Activity implements UserTeamAsyncResponse {
         
         //Check username and password is entered
         if(!userN.isEmpty() && !pass.isEmpty()){
-            LoginHttpRequest logIn = new LoginHttpRequest(context, userName.getText().toString(), userPass.getText().toString());
+            String passwordHashed = hashPassword(pass);
+            LoginHttpRequest logIn = new LoginHttpRequest(context, userName.getText().toString(), passwordHashed);
             logIn.delegate = this;
             logIn.execute();
             
@@ -102,6 +106,37 @@ public class Login extends Activity implements UserTeamAsyncResponse {
         startActivity(intent);
 
     }
+    
+    private String hashPassword(String password){
+        final MessageDigest digest;
+        String toReturn = "";
+        byte[] result;
+        try {
+            digest = MessageDigest.getInstance("SHA-1");
+            result = digest.digest(password.getBytes("UTF-8"));
+            StringBuilder sb = new StringBuilder();
+
+            for (byte b : result) // This is your byte[] result..
+            {
+                sb.append(String.format("%02X", b));
+            }
+            toReturn = sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+
+        
+        
+        return toReturn;
+
+        
+
+        
+    }
+    
 
 
     @Override
@@ -120,7 +155,17 @@ public class Login extends Activity implements UserTeamAsyncResponse {
                     Toast.LENGTH_LONG).show();
         }
     }
-    
+
+    @Override
+    public void processInvites(String sentBy) {
+        
+    }
+
+    @Override
+    public void processDate(String epochDate) {
+        
+    }
+
 
     @Override
     public void processFinish(ArrayList<Player> players) {

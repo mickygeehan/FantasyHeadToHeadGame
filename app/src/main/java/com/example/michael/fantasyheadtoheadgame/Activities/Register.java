@@ -11,6 +11,10 @@ import android.widget.Toast;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.RegisterHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.R;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 /**
  * Created by michaelgeehan on 10/02/2017.
  */
@@ -46,12 +50,42 @@ public class Register extends Activity {
         
         if(checkFields(userName,email,fullName,password1,password2)){
             if(passwordsMatch(password1,password2)){
-                RegisterHttpRequest reg = new RegisterHttpRequest(context,userName,password1,email,fullName);
+                RegisterHttpRequest reg = new RegisterHttpRequest(context,userName,hashPassword(password1),email,fullName);
                 reg.execute();
             }else{
                 displayToast("Password's do not match!");
             }
         }
+
+    }
+
+    private String hashPassword(String password){
+        final MessageDigest digest;
+        String toReturn = "";
+        byte[] result;
+        try {
+            digest = MessageDigest.getInstance("SHA-1");
+            result = digest.digest(password.getBytes("UTF-8"));
+            StringBuilder sb = new StringBuilder();
+
+            for (byte b : result) // This is your byte[] result..
+            {
+                sb.append(String.format("%02X", b));
+            }
+            toReturn = sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+        return toReturn;
+
+
+
 
     }
     

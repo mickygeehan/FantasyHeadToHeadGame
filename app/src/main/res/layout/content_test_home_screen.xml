@@ -123,27 +123,6 @@
         android:layout_alignStart="@+id/imageButton10"
         android:layout_alignEnd="@+id/imageButton10" />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:backgroundTint="@android:color/transparent"
-        android:onClick="findHeadToHead"
-        android:layout_height="wrap_content"
-        app:srcCompat="@android:drawable/star_big_on"
-        android:id="@+id/imageButton3"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
-
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:backgroundTint="@android:color/transparent"
-        android:onClick="openSearchScreen"
-        android:layout_height="wrap_content"
-        app:srcCompat="@android:drawable/ic_search_category_default"
-        android:background="#778cc29d"
-        android:id="@+id/imageButton2"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true" />
-
     <TextView
         android:text="TextView"
         android:layout_width="wrap_content"
@@ -276,4 +255,26 @@
         android:layout_below="@+id/xmlPlayer8Name"
         android:layout_alignEnd="@+id/xmlPlayer9Name"
         android:layout_alignStart="@+id/imageButton9" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:backgroundTint="@android:color/transparent"
+        android:onClick="openSearchScreen"
+        android:layout_height="wrap_content"
+        app:srcCompat="@android:drawable/ic_search_category_default"
+        android:background="#778cc29d"
+        android:id="@+id/imageButton2"
+        android:layout_alignTop="@+id/imageButton3"
+        android:layout_alignParentEnd="true" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:backgroundTint="@android:color/transparent"
+        android:onClick="findHeadToHead"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/h2h_opt"
+        android:id="@+id/imageButton3"
+        android:layout_marginBottom="9dp"
+        android:layout_alignBottom="@+id/xmlchangePlayer1Bt"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>
