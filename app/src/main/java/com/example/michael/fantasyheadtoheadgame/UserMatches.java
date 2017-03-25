@@ -1,5 +1,6 @@
 package com.example.michael.fantasyheadtoheadgame;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -62,12 +63,22 @@ public class UserMatches extends AppCompatActivity implements UserTeamAsyncRespo
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> listView, View itemView, final int itemPosition, long itemId) {
                 String opponentSelected = opponents.get(itemPosition);
-                
+                ArrayList<Game> toSend = new ArrayList<>();
                 for(Game g: allGames){
                     if(g.getUser1().getUsername().equals(opponentSelected)||g.getUser2().getUsername().equals(opponentSelected)){
                         System.out.println("Found a game");
+                        toSend.add(g);
                     }
                 }
+                
+                //Send to individual screen to display all matches
+                Intent i = new Intent(getApplicationContext(), SpecifiedUserContest.class);
+                i.putExtra("listGames", toSend);
+                i.putExtra("opponent",opponentSelected);
+                i.putExtra("currentUser",username);
+                startActivity(i);
+                
+                
             }
         });
         

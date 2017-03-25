@@ -37,6 +37,7 @@ public class Login extends Activity implements UserTeamAsyncResponse {
     //Error Labels
     private final String userNameEmpty = "Please enter a username!";
     private final String passwordEmpty = "Please enter a password!";
+    private final String invalidUsername = "That is an invalid username!";
     
 
 
@@ -81,10 +82,17 @@ public class Login extends Activity implements UserTeamAsyncResponse {
         
         //Check username and password is entered
         if(!userN.isEmpty() && !pass.isEmpty()){
-            String passwordHashed = hashPassword(pass);
-            LoginHttpRequest logIn = new LoginHttpRequest(context, userName.getText().toString(), passwordHashed);
-            logIn.delegate = this;
-            logIn.execute();
+            
+            //for sql prevention
+            if(isCleanInput(userN)){
+                String passwordHashed = hashPassword(pass);
+                LoginHttpRequest logIn = new LoginHttpRequest(context, userName.getText().toString(), passwordHashed);
+                logIn.delegate = this;
+                logIn.execute();
+            }else{
+                displayToast(invalidUsername);
+            }
+            
             
         }else{
             if(userN.isEmpty()){
@@ -95,6 +103,15 @@ public class Login extends Activity implements UserTeamAsyncResponse {
         }
         
     }
+    
+    //Prevents sql injection
+    public boolean isCleanInput(String s){
+        String pattern= "^[a-zA-Z0-9]*$";
+        return s.matches(pattern);
+    }
+    
+    
+
     
     private void displayToast(String message){
         Toast.makeText(this, message,
@@ -112,7 +129,7 @@ public class Login extends Activity implements UserTeamAsyncResponse {
         String toReturn = "";
         byte[] result;
         try {
-            digest = MessageDigest.getInstance("SHA-1");
+            digest = MessageDigest.getInstance("SHA-256");
             result = digest.digest(password.getBytes("UTF-8"));
             StringBuilder sb = new StringBuilder();
 

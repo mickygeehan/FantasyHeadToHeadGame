@@ -64,10 +64,12 @@ public class MainHub extends AppCompatActivity implements UserTeamAsyncResponse 
 //            TextView userView = (TextView)findViewById(R.id.xmlMHDisplayUsername);
 //            userView.setText("Welcome "+user.getUsername());
             getSupportActionBar().setTitle("Welcome back "+user.getUsername());
+            //gets deadline
+            getDeadline();
         }
         
-        //gets deadline
-        getDeadline();
+       
+        
         
     }
 

@@ -14,6 +14,7 @@
     <Button
         android:layout_width="250sp"
         android:layout_height="wrap_content"
+        
         android:text="Register"
         android:layout_below="@+id/regPassword2"
         android:layout_centerHorizontal="true"
@@ -24,11 +25,10 @@
     <ImageView
         android:src="@android:drawable/sym_action_email"
         android:layout_width="wrap_content"
+        
         android:layout_height="wrap_content"
         android:id="@+id/imageView2"
         android:layout_alignTop="@+id/regEmail"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:layout_above="@+id/regFullName" />
 
     <EditText
@@ -37,7 +37,7 @@
         android:padding="9dp"
         android:hint="Full name"
         android:id="@+id/regFullName"
-        android:background="#FFFFFF"
+        android:background="@drawable/round_edittext"
         android:textColorHint="#5e5b5b"
         android:layout_marginTop="13dp"
         android:textColor="#5e5b5b"
@@ -53,7 +53,7 @@
         android:padding="9dp"
         android:hint="Retype password"
         android:id="@+id/regPassword2"
-        android:background="#FFFFFF"
+        android:background="@drawable/round_edittext"
         android:textColorHint="#5e5b5b"
         android:layout_marginTop="13dp"
         android:layout_below="@+id/regPassword1"
@@ -65,7 +65,7 @@
 
     <ImageView
         android:src="@android:drawable/sym_def_app_icon"
-        android:background="#FFFFFF"
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView4"
@@ -74,7 +74,7 @@
         android:layout_toStartOf="@+id/regUsername" />
 
     <ImageView
-        android:src="@android:drawable/ic_menu_my_calendar"
+        android:src="@android:drawable/ic_input_get"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView5"
@@ -120,7 +120,7 @@
         android:hint="Email"
         android:id="@+id/regEmail"
         android:textColor="#5e5b5b"
-        android:background="#FFFFFF"
+        android:background="@drawable/round_edittext"
         android:textColorHint="#5e5b5b"
         android:layout_marginTop="12dp"
         android:layout_below="@+id/regUsername"
@@ -133,7 +133,7 @@
         android:layout_height="wrap_content"
         android:hint="Username"
         android:id="@+id/regUsername"
-        android:background="#FFFFFF"
+        android:background="@drawable/round_edittext"
         android:textColor="#5e5b5b"
         android:padding="9dp"
         android:textColorHint="#5e5b5b"
@@ -148,7 +148,7 @@
         android:padding="9dp"
         android:hint="Password"
         android:id="@+id/regPassword1"
-        android:background="#FFFFFF"
+        android:background="@drawable/round_edittext"
         android:textColorHint="#5e5b5b"
         android:layout_marginTop="13dp"
         android:layout_below="@+id/regFullName"

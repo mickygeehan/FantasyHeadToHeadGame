@@ -48,13 +48,24 @@ public class Register extends Activity {
         String password1 = password1EditText.getText().toString();
         String password2 = password2EditText.getText().toString();
         
-        if(checkFields(userName,email,fullName,password1,password2)){
-            if(passwordsMatch(password1,password2)){
-                RegisterHttpRequest reg = new RegisterHttpRequest(context,userName,hashPassword(password1),email,fullName);
-                reg.execute();
-            }else{
-                displayToast("Password's do not match!");
+        //checks that all input is correct
+        //check not empty + check for sql injection prevention
+        if(checkFieldsEmpty(userName,email,fullName,password1,password2)){
+            if(isCleanInput(userName)){
+                    if(isCleanInput(fullName)) {
+
+                        if (passwordsMatch(password1, password2)) {
+
+                            RegisterHttpRequest reg = new RegisterHttpRequest(context, userName, hashPassword(password1), email, fullName);
+                            reg.execute();
+                        } else {
+                            displayToast("Password's do not match!");
+                        }
+
+
+                    }
             }
+            
         }
 
     }
@@ -64,7 +75,7 @@ public class Register extends Activity {
         String toReturn = "";
         byte[] result;
         try {
-            digest = MessageDigest.getInstance("SHA-1");
+            digest = MessageDigest.getInstance("SHA-256");
             result = digest.digest(password.getBytes("UTF-8"));
             StringBuilder sb = new StringBuilder();
 
@@ -78,18 +89,19 @@ public class Register extends Activity {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
-
-
-
+        
         return toReturn;
-
-
-
-
+        
     }
     
-    private boolean checkFields(String userName,String email,String fullName,String password1,String password2){
+    //prevents sql injection
+    public boolean isCleanInput(String s){
+        String pattern= "^[a-zA-Z0-9]*$";
+        return s.matches(pattern);
+    }
+    
+    
+    private boolean checkFieldsEmpty(String userName,String email,String fullName,String password1,String password2){
         if(userName.isEmpty()){
             displayToast(userNameEmpty);
             return false;

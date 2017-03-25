@@ -94,7 +94,14 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
             }
         });
     }
-    
+
+    //prevents sql injection
+    public boolean isCleanInput(String s){
+        String pattern= "^[a-zA-Z0-9]*$";
+        return s.matches(pattern);
+    }
+
+
     public void searchForPlayer(View view){
         EditText firstName = (EditText)findViewById(R.id.xmlFirstNameQuery);
         EditText webName = (EditText)findViewById(R.id.xmlSecondNameQuery);
@@ -106,13 +113,25 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
         if(fnStr.isEmpty() && wnStr.isEmpty()){
             displayToast("Please enter a search query");
         }else{
+            
             if(fnStr.isEmpty()){
-                searchPlayersReq = new SearchPlayerHttpRequest(this,wnStr);
+                if(isCleanInput(wnStr)){
+                    searchPlayersReq = new SearchPlayerHttpRequest(this,wnStr);
+                    searchPlayersReq.delegate = this;
+                    searchPlayersReq.execute();
+                }
+                
             }else{
-                searchPlayersReq = new SearchPlayerHttpRequest(this,wnStr,fnStr);
+                if(isCleanInput(wnStr)){
+                    if(isCleanInput(fnStr)){
+                        searchPlayersReq = new SearchPlayerHttpRequest(this,wnStr,fnStr);
+                        searchPlayersReq.delegate = this;
+                        searchPlayersReq.execute();
+                    }
+                }
+                
             }
-            searchPlayersReq.delegate = this;
-            searchPlayersReq.execute();
+            
         }
     }
 

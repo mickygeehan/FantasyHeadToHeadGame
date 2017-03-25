@@ -19,4 +19,143 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="113dp" />
+
+    <TextView
+        android:text="Draws"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView6"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/textView5"
+        android:layout_marginStart="18dp" />
+
+    <TextView
+        android:text="Losses"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView7"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/textView6"
+        android:layout_marginStart="15dp" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:maxLength="2"
+        android:layout_height="wrap_content"
+        android:id="@+id/xmlFirstDraws"
+        android:layout_alignBaseline="@+id/xmlFirstWins"
+        android:layout_alignBottom="@+id/xmlFirstWins"
+        android:layout_alignEnd="@+id/textView6"
+        android:layout_marginEnd="10dp" />
+
+    <TextView
+        android:text="TextView"
+        android:maxLength="2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/xmlFirstLosses"
+        android:layout_marginEnd="13dp"
+        android:layout_alignBaseline="@+id/xmlFirstDraws"
+        android:layout_alignBottom="@+id/xmlFirstDraws"
+        android:layout_alignEnd="@+id/textView7" />
+
+    <TextView
+        android:text="TextView"
+        android:maxLength="2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/xmlSecondWins"
+        android:layout_alignBaseline="@+id/xmlUserInSecond"
+        android:layout_alignBottom="@+id/xmlUserInSecond"
+        android:layout_alignStart="@+id/xmlFirstWins" />
+
+    <TextView
+        android:text="TextView"
+        android:maxLength="2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/xmlSecondDraws"
+        android:layout_alignBaseline="@+id/xmlSecondWins"
+        android:layout_alignBottom="@+id/xmlSecondWins"
+        android:layout_alignStart="@+id/xmlFirstDraws" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:id="@+id/xmlUserInFirst"
+        android:layout_below="@+id/textView5"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="TextView"
+        android:maxLength="2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/xmlFirstWins"
+        android:layout_marginEnd="7dp"
+        android:layout_alignBaseline="@+id/xmlUserInFirst"
+        android:layout_alignBottom="@+id/xmlUserInFirst"
+        android:layout_alignEnd="@+id/textView5" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="13dp"
+        android:id="@+id/xmlUserInSecond"
+        android:layout_below="@+id/xmlUserInFirst"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="TextView"
+        android:maxLength="2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/xmlSecondLosses"
+        android:layout_alignBaseline="@+id/xmlSecondDraws"
+        android:layout_alignBottom="@+id/xmlSecondDraws"
+        android:layout_alignStart="@+id/xmlFirstLosses" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:maxLength="2"
+        android:layout_height="wrap_content"
+        android:id="@+id/xmlSecondUserPoints"
+        android:layout_alignBaseline="@+id/xmlSecondLosses"
+        android:layout_alignBottom="@+id/xmlSecondLosses"
+        android:layout_alignStart="@+id/xmlFirstUserPoints" />
+
+    <TextView
+        android:text="TextView"
+        android:maxLength="2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/xmlFirstUserPoints"
+        android:layout_marginStart="31dp"
+        android:layout_alignBaseline="@+id/xmlFirstLosses"
+        android:layout_alignBottom="@+id/xmlFirstLosses"
+        android:layout_toEndOf="@+id/xmlFirstLosses" />
+
+    <TextView
+        android:text="Points"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView10"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/textView7"
+        android:layout_marginStart="21dp" />
+
+    <TextView
+        android:text="Wins"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView5"
+        android:layout_marginStart="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/xmlUserInFirst" />
+
 </RelativeLayout>
