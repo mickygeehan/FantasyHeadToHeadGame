@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 
 import com.example.michael.fantasyheadtoheadgame.Activities.Login;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
+import com.example.michael.fantasyheadtoheadgame.Constants;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 
 import org.apache.http.HttpResponse;
@@ -45,7 +46,7 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
         this.mainContext = context;
         this.userName = username;
         this.userPass = password;
-       this.URL = addLoginToUrl("http://10.0.2.2:8888/FantasyShowDown/login.php",username,password);
+       this.URL = addLoginToUrl("http://"+ Constants.IP_ADDRESS+":8888/FantasyShowDown/login.php",username,password);
         //this.URL = addLoginToUrl("http://10.102.10.146:8888/FantasyShowDown/login.php",username,password);
     }
 

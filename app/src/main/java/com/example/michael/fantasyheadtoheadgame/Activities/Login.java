@@ -2,8 +2,10 @@ package com.example.michael.fantasyheadtoheadgame.Activities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -13,11 +15,16 @@ import android.widget.Toast;
 
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
+import com.example.michael.fantasyheadtoheadgame.Constants;
+import com.example.michael.fantasyheadtoheadgame.HttpRequests.FindHeadToHeadMatchHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.LoginHttpRequest;
+import com.example.michael.fantasyheadtoheadgame.HttpRequests.SendHeadToHeadInviteHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 import com.example.michael.fantasyheadtoheadgame.MainHub;
 import com.example.michael.fantasyheadtoheadgame.R;
+import com.example.michael.fantasyheadtoheadgame.SecurityMethods;
 import com.example.michael.fantasyheadtoheadgame.SessionManager;
+import com.example.michael.fantasyheadtoheadgame.TestHomeScreen;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -35,9 +42,7 @@ public class Login extends Activity implements UserTeamAsyncResponse {
     SessionManager session;
     
     //Error Labels
-    private final String userNameEmpty = "Please enter a username!";
-    private final String passwordEmpty = "Please enter a password!";
-    private final String invalidUsername = "That is an invalid username!";
+    
     
 
 
@@ -64,54 +69,36 @@ public class Login extends Activity implements UserTeamAsyncResponse {
         this.finish();
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        super.onCreateOptionsMenu(menu);
-//        getMenuInflater().inflate(R.menu.menu, menu);
-//        return true;
-//    }
     
-    public void logIn(View view) {
+    public void logIn(View view){
         EditText userName = (EditText) findViewById(R.id.userName);
         EditText userPass = (EditText) findViewById(R.id.password);
         
         String userN = userName.getText().toString();
         String pass = userPass.getText().toString();
         
-        System.out.println(pass);
         
         //Check username and password is entered
         if(!userN.isEmpty() && !pass.isEmpty()){
-            
             //for sql prevention
-            if(isCleanInput(userN)){
-                String passwordHashed = hashPassword(pass);
+            if(SecurityMethods.isCleanInput(userN)){
+                String passwordHashed = SecurityMethods.hashPassword(pass);
                 LoginHttpRequest logIn = new LoginHttpRequest(context, userName.getText().toString(), passwordHashed);
                 logIn.delegate = this;
                 logIn.execute();
             }else{
-                displayToast(invalidUsername);
+                displayToast(Constants.INVALID_USERNAME);
             }
-            
-            
         }else{
             if(userN.isEmpty()){
-                displayToast(userNameEmpty);
+                displayToast(Constants.USERNAME_EMPTY);
             }else{
-                displayToast(passwordEmpty);
+                displayToast(Constants.PASSWORD_EMPTY);
             }
         }
         
     }
     
-    //Prevents sql injection
-    public boolean isCleanInput(String s){
-        String pattern= "^[a-zA-Z0-9]*$";
-        return s.matches(pattern);
-    }
-    
-    
-
     
     private void displayToast(String message){
         Toast.makeText(this, message,
@@ -121,41 +108,33 @@ public class Login extends Activity implements UserTeamAsyncResponse {
     public void registerUser(View view) {
         Intent intent = new Intent(Login.this, Register.class);
         startActivity(intent);
-
     }
     
-    private String hashPassword(String password){
-        final MessageDigest digest;
-        String toReturn = "";
-        byte[] result;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-            result = digest.digest(password.getBytes("UTF-8"));
-            StringBuilder sb = new StringBuilder();
+    
+    public void changeIP(View view){
+        final EditText input = new EditText(this);
+        input.setHint("Set IP address");
+        AlertDialog.Builder builder = new AlertDialog.Builder(Login.this);
+        builder.setView(input);
+        builder.setTitle("Change IP")
+                .setPositiveButton("Change", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Constants.IP_ADDRESS = input.getText().toString();
+                    }
 
-            for (byte b : result) // This is your byte[] result..
-            {
-                sb.append(String.format("%02X", b));
-            }
-            toReturn = sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
+                    }
 
-        
-        
-        return toReturn;
-
-        
-
-        
+                });
+        builder.show();
     }
     
-
-
+    
     @Override
     public void processLogin(User user) {
         if(user != null){

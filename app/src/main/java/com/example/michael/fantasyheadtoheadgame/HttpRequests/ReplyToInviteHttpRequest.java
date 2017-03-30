@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 
+import com.example.michael.fantasyheadtoheadgame.Constants;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 
 import org.apache.http.HttpResponse;
@@ -31,7 +32,7 @@ public class ReplyToInviteHttpRequest extends AsyncTask<Object, Object, String> 
 
     public ReplyToInviteHttpRequest(Context context,int userID,String fromUsername,String toUsername){
         this.mainContext = context;
-        this.URL = "http://10.0.2.2:8888/FantasyShowDown/ReplyToInvite.php?acceptedUserID="+userID+"&fromUsername="+fromUsername+"&toUsername="+toUsername;
+        this.URL = "http://"+ Constants.IP_ADDRESS+":8888/FantasyShowDown/ReplyToInvite.php?acceptedUserID="+userID+"&fromUsername="+fromUsername+"&toUsername="+toUsername;
         //this.URL = "http://10.102.10.146:8888/FantasyShowDown/FindHeadToHeadMatch.php?username="+userName+"&userID="+userID;
         System.out.println(this.URL);
     }

@@ -53,7 +53,7 @@
     android:shadowDx="0"
     android:shadowDy="0"
     android:shadowRadius="5"
-        android:layout_marginTop="33dp"
+        android:layout_marginTop="20dp"
         android:layout_below="@+id/xmlDateView"
         android:layout_centerHorizontal="true" />
 
@@ -61,11 +61,24 @@
         android:text="TextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/xmlDateView"
+        android:layout_marginTop="9dp"
         android:textSize="25sp"
+        android:gravity="center"
         android:textColor="#151826"
-        android:layout_marginTop="43dp"
+        android:id="@+id/xmlGameweek"
         android:layout_below="@+id/imageView3"
         android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:id="@+id/xmlDateView"
+        android:textSize="20sp"
+        android:textColor="#151826"
+        android:layout_marginTop="9dp"
+        android:layout_below="@+id/xmlGameweek"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

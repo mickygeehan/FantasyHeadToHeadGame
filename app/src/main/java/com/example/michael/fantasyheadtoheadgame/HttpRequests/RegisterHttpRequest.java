@@ -6,6 +6,7 @@ import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 
 import com.example.michael.fantasyheadtoheadgame.Activities.Register;
+import com.example.michael.fantasyheadtoheadgame.Constants;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -34,7 +35,7 @@ public class RegisterHttpRequest extends AsyncTask<Void, Void, String> {
     public RegisterHttpRequest(Context context,String userName,String password,String email,String fullName){
         this.mainContext = context;
         //this.URL = "http://192.168.1.105:8888/register.php?userN="+userName+"&password="+password+"&email="+email+"&fullN="+fullName+"";
-        this.URL = "http://10.0.2.2:8888/FantasyShowDown/register.php?userN="+userName+"&password="+password+"&email="+email+"&fullN="+fullName+"";
+        this.URL = "http://"+ Constants.IP_ADDRESS+":8888/FantasyShowDown/register.php?userN="+userName+"&password="+password+"&email="+email+"&fullN="+fullName+"";
         //this.URL = "http://10.102.10.146:8888/FantasyShowDown/register.php?userN="+userName+"&password="+password+"&email="+email+"&fullN="+fullName+"";
     }
 

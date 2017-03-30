@@ -6,6 +6,7 @@ import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
+import com.example.michael.fantasyheadtoheadgame.Constants;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 
 import org.apache.http.HttpResponse;
@@ -36,13 +37,13 @@ public class SearchPlayerHttpRequest extends AsyncTask<Void, Void, ArrayList<Pla
 
     public SearchPlayerHttpRequest(Context context, String webName,String firstName){
         this.mainContext = context;
-        this.URL = "http://10.0.2.2:8888/FantasyShowDown/SearchForPlayer.php?webName="+webName+"&firstName="+firstName;
+        this.URL = "http://"+ Constants.IP_ADDRESS+":8888/FantasyShowDown/SearchForPlayer.php?webName="+webName+"&firstName="+firstName;
         //this.URL = "http://10.102.10.146:8888/FantasyShowDown/SearchForPlayer.php?webName="+webName+"&firstName="+firstName;
     }
 
     public SearchPlayerHttpRequest(Context context, String webName){
         this.mainContext = context;
-        this.URL = "http://10.0.2.2:8888/FantasyShowDown/SearchForPlayer.php?webName="+webName;
+        this.URL = "http://"+ Constants.IP_ADDRESS+":8888/FantasyShowDown/SearchForPlayer.php?webName="+webName;
        // this.URL = "http://10.102.10.146:8888/FantasyShowDown/SearchForPlayer.php?webName="+webName;
         System.out.println(URL);
     }

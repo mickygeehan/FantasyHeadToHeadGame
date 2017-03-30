@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 
+import com.example.michael.fantasyheadtoheadgame.Constants;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 
 import org.apache.http.HttpResponse;
@@ -31,7 +32,7 @@ public class FindInvitesHttprequest extends AsyncTask<Object, Object, String> {
 
     public FindInvitesHttprequest(Context context,int userID,String userName){
         this.mainContext = context;
-        this.URL = "http://10.0.2.2:8888/FantasyShowDown/CheckNewInvites.php?username="+userName+"&userID="+userID;
+        this.URL = "http://"+ Constants.IP_ADDRESS+":8888/FantasyShowDown/CheckNewInvites.php?username="+userName+"&userID="+userID;
         //this.URL = "http://10.102.10.146:8888/FantasyShowDown/FindHeadToHeadMatch.php?username="+userName+"&userID="+userID;
     }
 

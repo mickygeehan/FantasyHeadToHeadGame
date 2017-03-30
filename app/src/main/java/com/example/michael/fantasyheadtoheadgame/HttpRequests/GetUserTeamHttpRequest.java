@@ -6,6 +6,7 @@ import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
+import com.example.michael.fantasyheadtoheadgame.Constants;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 
 import org.apache.http.HttpResponse;
@@ -36,7 +37,7 @@ public class GetUserTeamHttpRequest extends AsyncTask<Void, Void, ArrayList<Play
 
     public GetUserTeamHttpRequest(Context context, int id){
         this.mainContext = context;
-      this.URL = "http://10.0.2.2:8888/FantasyShowDown/GetUserTeam.php?userID="+id;
+      this.URL = "http://"+ Constants.IP_ADDRESS+":8888/FantasyShowDown/GetUserTeam.php?userID="+id;
       //  this.URL = "http://10.102.10.146:8888/FantasyShowDown/GetUserTeam.php?userID="+id;
 
     }

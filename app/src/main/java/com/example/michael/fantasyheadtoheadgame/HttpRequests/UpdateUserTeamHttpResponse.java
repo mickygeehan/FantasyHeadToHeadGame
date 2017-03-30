@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 
+import com.example.michael.fantasyheadtoheadgame.Constants;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 
 import org.apache.http.HttpResponse;
@@ -25,7 +26,6 @@ public class UpdateUserTeamHttpResponse extends AsyncTask<Object, Object, String
     public UserTeamAsyncResponse delegate = null;
     String URL;
     AndroidHttpClient mClient = AndroidHttpClient.newInstance("");
-
     private Context mainContext;
     private ProgressDialog asyncDialog; 
 
@@ -33,8 +33,7 @@ public class UpdateUserTeamHttpResponse extends AsyncTask<Object, Object, String
 
     public UpdateUserTeamHttpResponse(Context context,String urlToAdd){
         this.mainContext = context;
-        this.URL = "http://10.0.2.2:8888/FantasyShowDown/UpdateUserTeam.php"+urlToAdd;
-       //this.URL = "http://10.102.10.146:8888/FantasyShowDown/UpdateUserTeam.php"+urlToAdd;
+        this.URL = "http://"+ Constants.IP_ADDRESS+":8888/FantasyShowDown/UpdateUserTeam.php"+urlToAdd;
         System.out.println(URL);
     }
 

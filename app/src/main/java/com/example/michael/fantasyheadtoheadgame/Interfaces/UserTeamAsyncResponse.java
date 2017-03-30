@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Created by michaelgeehan on 14/02/2017.
  */
 
-public interface UserTeamAsyncResponse {
+public interface UserTeamAsyncResponse{
     void processFinish(ArrayList<Player> players);
     void processUserUpdate(String result);
     void processUserMatches(ArrayList<User> users);

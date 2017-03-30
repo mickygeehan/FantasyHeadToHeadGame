@@ -142,12 +142,14 @@ public class MainHub extends AppCompatActivity implements UserTeamAsyncResponse 
 
     @Override
     public void processDate(String epochDate) {
-        System.out.println(epochDate);
+
+
+        String[] parts = epochDate.split("//");
         
-        Long epochT = Long.valueOf(epochDate);
+        Long epochT = Long.valueOf(parts[0]);
         Date date = new Date(epochT*1000);
         
-        System.out.println(date.getTime());
+     
 
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
@@ -155,6 +157,11 @@ public class MainHub extends AppCompatActivity implements UserTeamAsyncResponse 
         
         TextView xmlDate = (TextView)findViewById(R.id.xmlDateView);
         xmlDate.setText("Deadline: \n "+formDate);
+        
+        
+        TextView gameweek = (TextView)findViewById(R.id.xmlGameweek);
+        gameweek.setText("Gameweek: "+parts[1]);
+        
 
     }
 }

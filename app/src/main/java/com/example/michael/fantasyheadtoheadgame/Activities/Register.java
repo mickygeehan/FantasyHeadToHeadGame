@@ -7,13 +7,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
+import com.example.michael.fantasyheadtoheadgame.CommonUtilityMethods;
+import com.example.michael.fantasyheadtoheadgame.Constants;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.RegisterHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.R;
+import com.example.michael.fantasyheadtoheadgame.SecurityMethods;
 
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by michaelgeehan on 10/02/2017.
@@ -21,12 +20,6 @@ import java.security.NoSuchAlgorithmException;
 
 public class Register extends Activity {
     private static Context context;
-    
-    //Error labels
-    private final String userNameEmpty = "Please enter a username!";
-    private final String passwordEmpty = "Please enter a password!";
-    private final String emailEmpty = "Please enter an email!";
-    private final String fullNameEmpty = "Please enter a name!";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,15 +44,15 @@ public class Register extends Activity {
         //checks that all input is correct
         //check not empty + check for sql injection prevention
         if(checkFieldsEmpty(userName,email,fullName,password1,password2)){
-            if(isCleanInput(userName)){
-                    if(isCleanInput(fullName)) {
+            if(SecurityMethods.isCleanInput(userName)){
+                    if(SecurityMethods.isCleanInput(fullName)) {
 
                         if (passwordsMatch(password1, password2)) {
 
-                            RegisterHttpRequest reg = new RegisterHttpRequest(context, userName, hashPassword(password1), email, fullName);
+                            RegisterHttpRequest reg = new RegisterHttpRequest(context, userName, SecurityMethods.hashPassword(password1), email, fullName);
                             reg.execute();
                         } else {
-                            displayToast("Password's do not match!");
+                            CommonUtilityMethods.displayToast(getApplicationContext(),"Password's do not match!");
                         }
 
 
@@ -69,61 +62,27 @@ public class Register extends Activity {
         }
 
     }
-
-    private String hashPassword(String password){
-        final MessageDigest digest;
-        String toReturn = "";
-        byte[] result;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-            result = digest.digest(password.getBytes("UTF-8"));
-            StringBuilder sb = new StringBuilder();
-
-            for (byte b : result) // This is your byte[] result..
-            {
-                sb.append(String.format("%02X", b));
-            }
-            toReturn = sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        
-        return toReturn;
-        
-    }
-    
-    //prevents sql injection
-    public boolean isCleanInput(String s){
-        String pattern= "^[a-zA-Z0-9]*$";
-        return s.matches(pattern);
-    }
-    
     
     private boolean checkFieldsEmpty(String userName,String email,String fullName,String password1,String password2){
+        String message = "";
         if(userName.isEmpty()){
-            displayToast(userNameEmpty);
-            return false;
+            message = Constants.USERNAME_EMPTY;
         }else if(email.isEmpty()){
-            displayToast(emailEmpty);
-            return false;
+            message = Constants.EMAIL_EMPTY;
         }else if(fullName.isEmpty()){
-            displayToast(fullNameEmpty);
-            return false;
+            message = Constants.FULLNAME_EMPTY;
         }else if(password1.isEmpty()){
-            displayToast(passwordEmpty);
-            return false;
+            message = Constants.PASSWORD_EMPTY;
         }else if(password2.isEmpty()){
-            displayToast(passwordEmpty);
+            message = Constants.PASSWORD_EMPTY;
+        }
+        if(message.isEmpty()){
+            return true;
+        }else{
+            CommonUtilityMethods.displayToast(getApplicationContext(),message);
             return false;
         }
-        return true;
-    }
-
-    private void displayToast(String message){
-        Toast.makeText(this, message,
-                Toast.LENGTH_LONG).show();
+        
     }
     
     public void gotoLogin(View view){
@@ -131,7 +90,6 @@ public class Register extends Activity {
         startActivity(i);
         finish();
     }
-    
     
     private boolean passwordsMatch(String pass1,String pass2){
         return pass1.equals(pass2);
