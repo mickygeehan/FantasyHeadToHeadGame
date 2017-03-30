@@ -1,15 +1,12 @@
-package com.example.michael.fantasyheadtoheadgame.SearchPlayers;
+package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,31 +20,31 @@ import com.example.michael.fantasyheadtoheadgame.HttpRequests.UpdateUserTeamHttp
 import com.example.michael.fantasyheadtoheadgame.R;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.SearchPlayerHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
-import com.example.michael.fantasyheadtoheadgame.TestHomeScreen;
 
 import java.util.ArrayList;
 
 public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
     
-    ArrayList<Player> searchResults;
-    ListView searchResultsLv;
-    int sizeOfTeam = 0;
-    int budget = 0;
+    //Global Variables
+    private ArrayList<Player> searchResults;
+    private ListView searchResultsLv;
+    private int sizeOfTeam = 0;
+    private int budget = 0;
     
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_players);
-
         
-        final int numPlayers = (int) getIntent().getSerializableExtra("numberPlayers");
+        //initialise passed over variables
+        sizeOfTeam = (int) getIntent().getSerializableExtra("numberPlayers");
         final int userID = (int)getIntent().getSerializableExtra("userID");
         budget =  (int)getIntent().getSerializableExtra("budget");
-        sizeOfTeam = numPlayers;
+        
+        
+        //initialising the listview and code for on click of listview
         final ContextThemeWrapper ct = new ContextThemeWrapper(this, R.style.myDialog);
-        
-        
         //item click
         searchResultsLv = (ListView) findViewById(R.id.xmlListView);
         searchResultsLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -153,7 +150,6 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
     public void processFinish(ArrayList<Player> players){
         searchResults = players;
         ArrayList<String> playersNames = new ArrayList<>();
-        //playersNames.add(0,"Cost"+"\t\t\t\t||\t\t\t\t"+"Player Name");
         
         if(players != null){
             for(Player p: players){

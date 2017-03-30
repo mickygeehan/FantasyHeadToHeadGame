@@ -1,34 +1,24 @@
-package com.example.michael.fantasyheadtoheadgame.Activities;
+package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.view.Menu;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
-import com.example.michael.fantasyheadtoheadgame.Constants;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.FindHeadToHeadMatchHttpRequest;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.CommonUtilityMethods;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.Constants;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.LoginHttpRequest;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.SendHeadToHeadInviteHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
-import com.example.michael.fantasyheadtoheadgame.MainHub;
 import com.example.michael.fantasyheadtoheadgame.R;
-import com.example.michael.fantasyheadtoheadgame.SecurityMethods;
-import com.example.michael.fantasyheadtoheadgame.SessionManager;
-import com.example.michael.fantasyheadtoheadgame.TestHomeScreen;
-
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.SecurityMethods;
+import com.example.michael.fantasyheadtoheadgame.Session.SessionManager;
 import java.util.ArrayList;
 
 
@@ -36,28 +26,23 @@ import java.util.ArrayList;
  * Created by michaelgeehan on 10/02/2017.
  */
 
-public class Login extends Activity implements UserTeamAsyncResponse {
+public class Login extends AppCompatActivity implements UserTeamAsyncResponse {
 
+    //local variables
     private static Context context;
-    SessionManager session;
-    
-    //Error Labels
-    
-    
-
+    private SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
         //Remove title bar
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        //Remove notification bar
-        //this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         //set content view AFTER ABOVE sequence (to avoid crash)
         this.setContentView(R.layout.login);
         
+        //set context
         context = Login.this;
 
     }
@@ -68,18 +53,17 @@ public class Login extends Activity implements UserTeamAsyncResponse {
         finishAffinity();
         this.finish();
     }
-
     
     public void logIn(View view){
+        //get edit text values and convert to string
         EditText userName = (EditText) findViewById(R.id.userName);
         EditText userPass = (EditText) findViewById(R.id.password);
-        
         String userN = userName.getText().toString();
         String pass = userPass.getText().toString();
         
-        
-        //Check username and password is entered
+        //Validity checks on all inputs & security checks SQL injection & password encryption
         if(!userN.isEmpty() && !pass.isEmpty()){
+            
             //for sql prevention
             if(SecurityMethods.isCleanInput(userN)){
                 String passwordHashed = SecurityMethods.hashPassword(pass);
@@ -87,22 +71,16 @@ public class Login extends Activity implements UserTeamAsyncResponse {
                 logIn.delegate = this;
                 logIn.execute();
             }else{
-                displayToast(Constants.INVALID_USERNAME);
+                CommonUtilityMethods.displayToast(context,Constants.INVALID_USERNAME);
             }
         }else{
             if(userN.isEmpty()){
-                displayToast(Constants.USERNAME_EMPTY);
+                CommonUtilityMethods.displayToast(context,Constants.USERNAME_EMPTY);
             }else{
-                displayToast(Constants.PASSWORD_EMPTY);
+                CommonUtilityMethods.displayToast(context,Constants.PASSWORD_EMPTY);
             }
         }
         
-    }
-    
-    
-    private void displayToast(String message){
-        Toast.makeText(this, message,
-                Toast.LENGTH_LONG).show();
     }
     
     public void registerUser(View view) {
@@ -110,9 +88,9 @@ public class Login extends Activity implements UserTeamAsyncResponse {
         startActivity(intent);
     }
     
-    
+    //for admins only for mobile device while server is not up & running online
     public void changeIP(View view){
-        final EditText input = new EditText(this);
+        final EditText input = new EditText(Login.this);
         input.setHint("Set IP address");
         AlertDialog.Builder builder = new AlertDialog.Builder(Login.this);
         builder.setView(input);
@@ -127,16 +105,15 @@ public class Login extends Activity implements UserTeamAsyncResponse {
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
+                        
                     }
 
                 });
         builder.show();
     }
     
-    
     @Override
-    public void processLogin(User user) {
+    public void processLogin(User user){
         if(user != null){
             session = new SessionManager(getApplicationContext());
             session.createLoginSession(user.getUsername(),user.getEmail(),user.getId());

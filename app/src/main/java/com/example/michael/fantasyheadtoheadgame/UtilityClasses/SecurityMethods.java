@@ -1,4 +1,4 @@
-package com.example.michael.fantasyheadtoheadgame;
+package com.example.michael.fantasyheadtoheadgame.UtilityClasses;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -35,10 +35,6 @@ public class SecurityMethods{
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
-
-
-
         return hashedPass;
 
 

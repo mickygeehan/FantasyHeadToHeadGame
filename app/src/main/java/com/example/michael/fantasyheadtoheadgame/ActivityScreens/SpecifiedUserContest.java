@@ -1,14 +1,14 @@
-package com.example.michael.fantasyheadtoheadgame;
+package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.michael.fantasyheadtoheadgame.Classes.Game;
+import com.example.michael.fantasyheadtoheadgame.R;
 
 import java.util.ArrayList;
 

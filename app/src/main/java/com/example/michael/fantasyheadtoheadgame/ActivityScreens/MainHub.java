@@ -1,4 +1,4 @@
-package com.example.michael.fantasyheadtoheadgame;
+package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,14 +9,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.michael.fantasyheadtoheadgame.Activities.Login;
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.GetDeadlineHttpRequest;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.ReplyToInviteHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
-
-import org.w3c.dom.Text;
+import com.example.michael.fantasyheadtoheadgame.R;
+import com.example.michael.fantasyheadtoheadgame.Session.SessionManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,9 +23,8 @@ import java.util.HashMap;
 
 public class MainHub extends AppCompatActivity implements UserTeamAsyncResponse {
     
-    private User user;
-    SharedPreferences mPrefs;
-    SessionManager session;
+    private User loggedInUser;
+    private SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +32,6 @@ public class MainHub extends AppCompatActivity implements UserTeamAsyncResponse 
         setContentView(R.layout.activity_main_hub);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        session = new SessionManager(getApplicationContext());
-        
-        
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,52 +42,36 @@ public class MainHub extends AppCompatActivity implements UserTeamAsyncResponse 
         });
 
         
-        session.checkLogin();
-        
+        //check if user logged in
+        session = new SessionManager(getApplicationContext());
+        checkUserLoggedIn();
+  
+    }
+    
+    private void setUserDetails(){
         HashMap<String, String> user1Details = session.getUserDetails();
-
         if(user1Details.get("name") == null){
             Intent i = new Intent(this, Login.class);
             startActivity(i);
             finish();
         }else{
-            //user = (User) getIntent().getSerializableExtra("UserClass");
-            user = new User(user1Details.get("name").toString(),user1Details.get("email").toString(),Integer.valueOf(user1Details.get("ID").toString()));
-
-//            TextView userView = (TextView)findViewById(R.id.xmlMHDisplayUsername);
-//            userView.setText("Welcome "+user.getUsername());
-            getSupportActionBar().setTitle("Welcome back "+user.getUsername());
+            loggedInUser = new User(user1Details.get("name").toString(),user1Details.get("email").toString(),Integer.valueOf(user1Details.get("ID").toString()));
+            getSupportActionBar().setTitle("Welcome back "+loggedInUser.getUsername());
             //gets deadline
             getDeadline();
         }
-        
-       
-        
-        
+    }
+    
+    private void checkUserLoggedIn(){
+        //if no session it will start login or else it will set user stuff
+        session.checkLogin();
+        setUserDetails();
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        session.checkLogin();
-        
-
-        HashMap<String, String> user1Details = session.getUserDetails();
-
-        if(user1Details.get("name") == null){
-            Intent i = new Intent(this, Login.class);
-            startActivity(i);
-            finish();
-        }else{
-            //user = (User) getIntent().getSerializableExtra("UserClass");
-            user = new User(user1Details.get("name").toString(),user1Details.get("email").toString(),Integer.valueOf(user1Details.get("ID").toString()));
-
-//            TextView userView = (TextView)findViewById(R.id.xmlMHDisplayUsername);
-//            userView.setText("Welcome "+user.getUsername());
-            getSupportActionBar().setTitle("Welcome back "+user.getUsername());
-        }
-
-        //getDeadline();
+        checkUserLoggedIn();
     }
     
     private void getDeadline(){
@@ -104,14 +81,14 @@ public class MainHub extends AppCompatActivity implements UserTeamAsyncResponse 
     }
 
     public void gotoUserTeamScreen(View view){
-        Intent intent = new Intent(this, TestHomeScreen.class);
-        intent.putExtra("UserClass", user);
+        Intent intent = new Intent(this, UserTeamScreen.class);
+        intent.putExtra("UserClass", loggedInUser);
         startActivity(intent);
     }
 
     public void gotoUserMatchesScreen(View view){
-        Intent intent = new Intent(this, UserMatches.class);
-        intent.putExtra("UserClass", user);
+        Intent intent = new Intent(this, UserContests.class);
+        intent.putExtra("UserClass", loggedInUser);
         startActivity(intent);
     }
 
@@ -142,16 +119,13 @@ public class MainHub extends AppCompatActivity implements UserTeamAsyncResponse 
 
     @Override
     public void processDate(String epochDate) {
-
-
+        
         String[] parts = epochDate.split("//");
         
         Long epochT = Long.valueOf(parts[0]);
         Date date = new Date(epochT*1000);
         
-     
-
-
+        
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         String formDate = sdf.format(date);
         
@@ -159,8 +133,8 @@ public class MainHub extends AppCompatActivity implements UserTeamAsyncResponse 
         xmlDate.setText("Deadline: \n "+formDate);
         
         
-        TextView gameweek = (TextView)findViewById(R.id.xmlGameweek);
-        gameweek.setText("Gameweek: "+parts[1]);
+        TextView gameWeek = (TextView)findViewById(R.id.xmlGameweek);
+        gameWeek.setText("Gameweek: "+parts[1]);
         
 
     }

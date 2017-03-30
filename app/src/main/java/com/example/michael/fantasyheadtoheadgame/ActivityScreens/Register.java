@@ -1,4 +1,4 @@
-package com.example.michael.fantasyheadtoheadgame.Activities;
+package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,11 +7,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-import com.example.michael.fantasyheadtoheadgame.CommonUtilityMethods;
-import com.example.michael.fantasyheadtoheadgame.Constants;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.CommonUtilityMethods;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.Constants;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.RegisterHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.R;
-import com.example.michael.fantasyheadtoheadgame.SecurityMethods;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.SecurityMethods;
 
 
 /**

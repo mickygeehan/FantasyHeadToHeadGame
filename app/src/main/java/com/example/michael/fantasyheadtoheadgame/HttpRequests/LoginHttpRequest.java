@@ -5,9 +5,8 @@ import android.content.Context;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 
-import com.example.michael.fantasyheadtoheadgame.Activities.Login;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
-import com.example.michael.fantasyheadtoheadgame.Constants;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.Constants;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 
 import org.apache.http.HttpResponse;

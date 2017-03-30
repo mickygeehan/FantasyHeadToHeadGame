@@ -9,7 +9,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="#097DC9"
-    tools:context="com.example.michael.fantasyheadtoheadgame.SpecifiedUserContest">
+    tools:context="com.example.michael.fantasyheadtoheadgame.ActivityScreens.SpecifiedUserContest">
 
 
     <ListView

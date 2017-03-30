@@ -1,9 +1,7 @@
-package com.example.michael.fantasyheadtoheadgame;
+package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 
-import android.app.ActionBar;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,7 +17,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.michael.fantasyheadtoheadgame.Activities.Login;
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.FindHeadToHeadMatchHttpRequest;
@@ -30,13 +27,12 @@ import com.example.michael.fantasyheadtoheadgame.HttpRequests.ReplyToInviteHttpR
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.SendHeadToHeadInviteHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.UpdateUserTeamHttpResponse;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
-import com.example.michael.fantasyheadtoheadgame.SearchPlayers.SearchPlayers;
-import com.google.gson.Gson;
+import com.example.michael.fantasyheadtoheadgame.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncResponse {
+public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncResponse {
     
     //User class
     private User u;
@@ -147,7 +143,7 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
     }
 
     public void openSearchScreen(View view){
-        Intent intent = new Intent(TestHomeScreen.this, SearchPlayers.class);
+        Intent intent = new Intent(UserTeamScreen.this, SearchPlayers.class);
         intent.putExtra("numberPlayers", playersInTeam.size());
         intent.putExtra("userID", u.getId());
         intent.putExtra("budget", u.getBudget());
@@ -170,14 +166,14 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
     public void findHeadToHead(View view){
         final EditText input = new EditText(this);
         input.setHint("Friends Username");
-        AlertDialog.Builder builder = new AlertDialog.Builder(TestHomeScreen.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(UserTeamScreen.this);
         builder.setView(input);
         builder.setTitle("Find H2H Contest")
                 .setNeutralButton("Send Invite", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        SendHeadToHeadInviteHttpRequest sendH2HInvite = new SendHeadToHeadInviteHttpRequest(TestHomeScreen.this,u.getId(),u.getUsername(),input.getText().toString());
-                        sendH2HInvite.delegate = TestHomeScreen.this;
+                        SendHeadToHeadInviteHttpRequest sendH2HInvite = new SendHeadToHeadInviteHttpRequest(UserTeamScreen.this,u.getId(),u.getUsername(),input.getText().toString());
+                        sendH2HInvite.delegate = UserTeamScreen.this;
                         sendH2HInvite.execute();
                     }
 
@@ -185,8 +181,8 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
                 .setPositiveButton("Random", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        FindHeadToHeadMatchHttpRequest findH2H = new FindHeadToHeadMatchHttpRequest(TestHomeScreen.this,u.getId(),u.getUsername());
-                        findH2H.delegate = TestHomeScreen.this;
+                        FindHeadToHeadMatchHttpRequest findH2H = new FindHeadToHeadMatchHttpRequest(UserTeamScreen.this,u.getId(),u.getUsername());
+                        findH2H.delegate = UserTeamScreen.this;
                         findH2H.execute();
                     }
 
@@ -441,14 +437,14 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
         if(sentBy.contains("You have no")){
             Toast.makeText(this,sentBy,Toast.LENGTH_LONG).show();
         }else{
-            AlertDialog.Builder builder = new AlertDialog.Builder(TestHomeScreen.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(UserTeamScreen.this);
             builder.setTitle("Received H2H Invite from: "+sentBy)
 
                     .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            ReplyToInviteHttpRequest replyH2H = new ReplyToInviteHttpRequest(TestHomeScreen.this,u.getId(),sentBy,u.getUsername());
-                            replyH2H.delegate = TestHomeScreen.this;
+                            ReplyToInviteHttpRequest replyH2H = new ReplyToInviteHttpRequest(UserTeamScreen.this,u.getId(),sentBy,u.getUsername());
+                            replyH2H.delegate = UserTeamScreen.this;
                             replyH2H.execute();
                         }
 
@@ -536,7 +532,7 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
                 // Code for button 3 click
                 playerLabel = (TextView)findViewById(R.id.xmlPlayer11Name);
                 selectedPlayer = playerMap.get(playerLabel.getText().toString());
-                System.out.println(playerMap.get(playerLabel.getText().toString()).getTeamCode());
+
 //                
                 break;
         }
@@ -564,7 +560,7 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
 
 
         final CharSequence[] cs = subOptions.toArray(new CharSequence[subOptions.size()]);
-        AlertDialog.Builder builder = new AlertDialog.Builder(TestHomeScreen.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(UserTeamScreen.this);
         builder.setTitle("Pick player")
                 .setItems(cs, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -639,7 +635,7 @@ public class TestHomeScreen extends AppCompatActivity implements UserTeamAsyncRe
         }
         url = url+"userID="+u.getId()+"&budget="+budget;
 
-        UpdateUserTeamHttpResponse getWeeklyTeam = new UpdateUserTeamHttpResponse(TestHomeScreen.this,url);
+        UpdateUserTeamHttpResponse getWeeklyTeam = new UpdateUserTeamHttpResponse(UserTeamScreen.this,url);
         getWeeklyTeam.delegate = this;
         getWeeklyTeam.execute();
     }

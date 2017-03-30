@@ -17,7 +17,7 @@ import android.widget.Toast;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.GetUserTeamHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.R;
-import com.example.michael.fantasyheadtoheadgame.SearchPlayers.SearchPlayers;
+import com.example.michael.fantasyheadtoheadgame.ActivityScreens.SearchPlayers;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.UpdateUserTeamHttpResponse;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;

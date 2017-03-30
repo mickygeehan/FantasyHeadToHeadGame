@@ -1,4 +1,4 @@
-package com.example.michael.fantasyheadtoheadgame;
+package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,14 +14,14 @@ import android.widget.ListView;
 import com.example.michael.fantasyheadtoheadgame.Classes.Game;
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.FindHeadToHeadMatchHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.GetUserMatchesHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
+import com.example.michael.fantasyheadtoheadgame.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class UserMatches extends AppCompatActivity implements UserTeamAsyncResponse {
+public class UserContests extends AppCompatActivity implements UserTeamAsyncResponse {
     
     private ListView lv;
     private String username;
@@ -66,7 +66,6 @@ public class UserMatches extends AppCompatActivity implements UserTeamAsyncRespo
                 ArrayList<Game> toSend = new ArrayList<>();
                 for(Game g: allGames){
                     if(g.getUser1().getUsername().equals(opponentSelected)||g.getUser2().getUsername().equals(opponentSelected)){
-                        System.out.println("Found a game");
                         toSend.add(g);
                     }
                 }
@@ -90,7 +89,7 @@ public class UserMatches extends AppCompatActivity implements UserTeamAsyncRespo
     }
     
     private void getOpponentsHttpCall(User user){
-        GetUserMatchesHttpRequest getMatches = new GetUserMatchesHttpRequest(UserMatches.this,user.getId(),user.getUsername());
+        GetUserMatchesHttpRequest getMatches = new GetUserMatchesHttpRequest(UserContests.this,user.getId(),user.getUsername());
         getMatches.delegate = this;
         getMatches.execute();
     }
@@ -115,7 +114,7 @@ public class UserMatches extends AppCompatActivity implements UserTeamAsyncRespo
         //display individual contests
         ArrayList<String> opponents = getContestAgainstUsers(users);
         for(String s: opponents){
-            System.out.println(s);
+
         }
 
         

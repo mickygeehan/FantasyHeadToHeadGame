@@ -5,8 +5,8 @@ import android.content.Context;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 
-import com.example.michael.fantasyheadtoheadgame.Activities.Register;
-import com.example.michael.fantasyheadtoheadgame.Constants;
+import com.example.michael.fantasyheadtoheadgame.ActivityScreens.Register;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.Constants;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;

@@ -1,4 +1,4 @@
-package com.example.michael.fantasyheadtoheadgame;
+package com.example.michael.fantasyheadtoheadgame.Session;
 
 /**
  * Created by michaelgeehan on 22/02/2017.
@@ -10,7 +10,7 @@ import java.util.HashMap;
         import android.content.SharedPreferences;
         import android.content.SharedPreferences.Editor;
 
-import com.example.michael.fantasyheadtoheadgame.Activities.Login;
+import com.example.michael.fantasyheadtoheadgame.ActivityScreens.Login;
 
 public class SessionManager {
     // Shared Preferences
