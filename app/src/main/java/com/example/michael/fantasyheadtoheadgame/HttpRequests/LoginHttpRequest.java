@@ -40,12 +40,15 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
 
     //user details
     String userName,userPass;
+    
+    //Request
+    
 
     public LoginHttpRequest(Context context,String username,String password){
         this.mainContext = context;
         this.userName = username;
         this.userPass = password;
-       this.URL = addLoginToUrl("http://"+ Constants.IP_ADDRESS+":8888/FantasyShowDown/login.php",username,password);
+       this.URL = addLoginToUrl("http://"+ Constants.IP_ADDRESS+":8888/FantasyShowDown/login.php?",username,password);
         //this.URL = addLoginToUrl("http://10.102.10.146:8888/FantasyShowDown/login.php",username,password);
     }
 
@@ -66,7 +69,6 @@ public class LoginHttpRequest extends AsyncTask<Void, Void, User> {
         HttpGet request = new HttpGet(URL);
         LoginHttpRequest.JSONResponseHandler responseHandler = new LoginHttpRequest.JSONResponseHandler();
         try {
-
             return mClient.execute(request, responseHandler);
         } catch (ClientProtocolException e) {
             e.printStackTrace();

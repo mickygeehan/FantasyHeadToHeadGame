@@ -1,5 +1,6 @@
 package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +18,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
+import com.example.michael.fantasyheadtoheadgame.Classes.RequestResponseParser;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.FindHeadToHeadMatchHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.FindInvitesHttprequest;
@@ -45,6 +49,9 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
     private int numDef,numMid,numAtt = 0;
     private int budget = 0;
 
+    private RequestQueue queue;
+    private RequestResponseParser responseParser;
+    private ProgressDialog progressD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +70,13 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
             }
         });
         
+        //initialise request
+        queue = Volley.newRequestQueue(this);
+        
+        if(!initialiseParser()){
+            responseParser = new RequestResponseParser();
+        }
+        
         //get user
         User user = (User) getIntent().getSerializableExtra("UserClass");
         u = user;
@@ -72,6 +86,16 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
         getBudget();
         callGetUserTeam(u.getId());
 
+    }
+
+    private boolean initialiseParser(){
+        responseParser = (RequestResponseParser) getIntent().getSerializableExtra("parser");
+        if(responseParser!=null ){
+            return true;
+        }else{
+            return false;
+
+        }
     }
     
     private void getHeadToHeadInvites(String uName){

@@ -67,7 +67,6 @@ public class GetDeadlineHttpRequest extends AsyncTask<Object, Object, String> {
         asyncDialog.dismiss();
         mClient.close();
         delegate.processDate(updated);
-
     }
 
 

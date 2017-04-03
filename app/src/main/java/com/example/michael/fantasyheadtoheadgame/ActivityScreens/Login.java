@@ -9,28 +9,36 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
-import android.widget.Toast;
-import com.example.michael.fantasyheadtoheadgame.Classes.Player;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.michael.fantasyheadtoheadgame.Classes.MySingleton;
+import com.example.michael.fantasyheadtoheadgame.Classes.RequestResponseParser;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.CommonUtilityMethods;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.Constants;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.LoginHttpRequest;
-import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 import com.example.michael.fantasyheadtoheadgame.R;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.SecurityMethods;
 import com.example.michael.fantasyheadtoheadgame.Session.SessionManager;
-import java.util.ArrayList;
+
+import java.io.Serializable;
 
 
 /**
  * Created by michaelgeehan on 10/02/2017.
  */
 
-public class Login extends AppCompatActivity implements UserTeamAsyncResponse {
+public class Login extends AppCompatActivity{
 
     //local variables
     private static Context context;
     private SessionManager session;
+    private RequestQueue queue;
+    private RequestResponseParser responseParser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +75,16 @@ public class Login extends AppCompatActivity implements UserTeamAsyncResponse {
             //for sql prevention
             if(SecurityMethods.isCleanInput(userN)){
                 String passwordHashed = SecurityMethods.hashPassword(pass);
-                LoginHttpRequest logIn = new LoginHttpRequest(context, userName.getText().toString(), passwordHashed);
-                logIn.delegate = this;
-                logIn.execute();
+//                LoginHttpRequest logIn = new LoginHttpRequest(context, userName.getText().toString(), passwordHashed);
+//                logIn.delegate = this;
+//                logIn.execute();
+                
+                //creating the RequestQueue
+                responseParser = new RequestResponseParser();
+                queue = MySingleton.getInstance(this.getApplicationContext()).
+                        getRequestQueue();
+                sendLoginRequest(userName.getText().toString(),passwordHashed);
+                
             }else{
                 CommonUtilityMethods.displayToast(context,Constants.INVALID_USERNAME);
             }
@@ -81,6 +96,44 @@ public class Login extends AppCompatActivity implements UserTeamAsyncResponse {
             }
         }
         
+    }
+    
+    public void sendLoginRequest(String userName,String passwordHashed){
+        String url ="http://"+ Constants.IP_ADDRESS+":8888/FantasyShowDown/login.php?userN="+userName+"&password="+passwordHashed;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        User u = responseParser.parseLoginResponse(response);
+                        
+                        if(checkValidUser(u)){
+                            session = new SessionManager(getApplicationContext());
+                            session.createLoginSession(u.getUsername(),u.getEmail(),u.getId());
+                            Intent intent = new Intent(context, MainHub.class);
+                            intent.putExtra("UserClass", u);
+                            intent.putExtra("parser",responseParser);
+                            context.startActivity(intent);
+                            finishAffinity();
+                        }else{
+                            CommonUtilityMethods.displayToast(getApplicationContext(),"I'm sorry your username/password is incorrect!!");
+                        }
+                        
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+    }
+    
+    public boolean checkValidUser(User u){
+        if(u != null){
+            return true;
+        }else{
+            return false;
+        }
     }
     
     public void registerUser(View view) {
@@ -112,48 +165,9 @@ public class Login extends AppCompatActivity implements UserTeamAsyncResponse {
         builder.show();
     }
     
-    @Override
-    public void processLogin(User user){
-        if(user != null){
-            session = new SessionManager(getApplicationContext());
-            session.createLoginSession(user.getUsername(),user.getEmail(),user.getId());
-            Intent intent = new Intent(context, MainHub.class);
-            intent.putExtra("UserClass", user);
-            context.startActivity(intent);
-            finishAffinity();
-            
+  
 
-        }else{
-            Toast.makeText(context, "I'm sorry your username/password is incorrect!!",
-                    Toast.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    public void processInvites(String sentBy) {
-        
-    }
-
-    @Override
-    public void processDate(String epochDate) {
-        
-    }
-
-
-    @Override
-    public void processFinish(ArrayList<Player> players) {
-        
-    }
-
-    @Override
-    public void processUserUpdate(String result) {
-
-    }
-
-    @Override
-    public void processUserMatches(ArrayList<User> users) {
-
-    }
+    
 
     
 }

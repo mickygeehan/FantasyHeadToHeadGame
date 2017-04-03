@@ -1,5 +1,7 @@
 package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 
+import android.app.Application;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,22 +11,35 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.michael.fantasyheadtoheadgame.Classes.MySingleton;
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
+import com.example.michael.fantasyheadtoheadgame.Classes.RequestResponseParser;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.GetDeadlineHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 import com.example.michael.fantasyheadtoheadgame.R;
 import com.example.michael.fantasyheadtoheadgame.Session.SessionManager;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.CommonUtilityMethods;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.Constants;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-public class MainHub extends AppCompatActivity implements UserTeamAsyncResponse {
+public class MainHub extends AppCompatActivity{
     
     private User loggedInUser;
     private SessionManager session;
+    private RequestQueue queue;
+    private RequestResponseParser responseParser;
+    private ProgressDialog progressD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +56,29 @@ public class MainHub extends AppCompatActivity implements UserTeamAsyncResponse 
             }
         });
 
+        queue = MySingleton.getInstance(this.getApplicationContext()).
+                getRequestQueue();
+
+
+        //queue = Volley.newRequestQueue(this);
+        if(!initialiseParser()){
+            responseParser = new RequestResponseParser();
+        }
         
         //check if user logged in
         session = new SessionManager(getApplicationContext());
         checkUserLoggedIn();
   
+    }
+    
+    private boolean initialiseParser(){
+        responseParser = (RequestResponseParser) getIntent().getSerializableExtra("parser");
+        if(responseParser!=null ){
+            return true;
+        }else{
+            return false;
+            
+        }
     }
     
     private void setUserDetails(){
@@ -75,14 +108,44 @@ public class MainHub extends AppCompatActivity implements UserTeamAsyncResponse 
     }
     
     private void getDeadline(){
-        GetDeadlineHttpRequest replyH2H = new GetDeadlineHttpRequest(MainHub.this);
-        replyH2H.delegate = MainHub.this;
-        replyH2H.execute();
+        //start loading bar
+        startProgressBar();
+        
+        //start url request
+        String url ="http://"+ Constants.IP_ADDRESS+":8888/FantasyShowDown/GetDeadline.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        progressD.cancel();
+                        processDate(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                progressD.cancel();
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
     }
-
+    
+    private boolean startProgressBar(){
+        progressD = new ProgressDialog(this);
+        if(progressD != null){
+            progressD.setMessage("Loading...");
+            progressD.show();
+            return true;
+        }
+        
+        return false;
+        
+    }
+    
     public void gotoUserTeamScreen(View view){
         Intent intent = new Intent(this, UserTeamScreen.class);
         intent.putExtra("UserClass", loggedInUser);
+        intent.putExtra("parser",responseParser);
         startActivity(intent);
     }
 
@@ -91,51 +154,31 @@ public class MainHub extends AppCompatActivity implements UserTeamAsyncResponse 
         intent.putExtra("UserClass", loggedInUser);
         startActivity(intent);
     }
-
-    @Override
-    public void processFinish(ArrayList<Player> players) {
+    
+    public boolean processDate(String epochDate){
+        boolean toReturn = false;
         
-    }
+        if(epochDate.contains("//")){
+            String[] parts = epochDate.split("//");
 
-    @Override
-    public void processUserUpdate(String result) {
+            Long epochT = Long.valueOf(parts[0]);
+            Date date = new Date(epochT*1000);
 
-    }
 
-    @Override
-    public void processUserMatches(ArrayList<User> users) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+            String formDate = sdf.format(date);
 
-    }
+            TextView xmlDate = (TextView)findViewById(R.id.xmlDateView);
+            xmlDate.setText("Deadline: \n "+formDate);
 
-    @Override
-    public void processLogin(User user) {
 
-    }
-
-    @Override
-    public void processInvites(String sentBy) {
-
-    }
-
-    @Override
-    public void processDate(String epochDate) {
+            TextView gameWeek = (TextView)findViewById(R.id.xmlGameweek);
+            gameWeek.setText("Gameweek: "+parts[1]);
+            toReturn = true;
+        }else{
+            toReturn = false;
+        }
         
-        String[] parts = epochDate.split("//");
-        
-        Long epochT = Long.valueOf(parts[0]);
-        Date date = new Date(epochT*1000);
-        
-        
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        String formDate = sdf.format(date);
-        
-        TextView xmlDate = (TextView)findViewById(R.id.xmlDateView);
-        xmlDate.setText("Deadline: \n "+formDate);
-        
-        
-        TextView gameWeek = (TextView)findViewById(R.id.xmlGameweek);
-        gameWeek.setText("Gameweek: "+parts[1]);
-        
-
+        return toReturn;
     }
 }
