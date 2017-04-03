@@ -71,6 +71,12 @@ public class MainHub extends AppCompatActivity{
         checkUserLoggedIn();
   
     }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        //checkUserLoggedIn();
+    }
     
     private boolean initialiseParser(){
         responseParser = (RequestResponseParser) getIntent().getSerializableExtra("parser");
@@ -100,12 +106,6 @@ public class MainHub extends AppCompatActivity{
         //if no session it will start login or else it will set user stuff
         session.checkLogin();
         setUserDetails();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        //checkUserLoggedIn();
     }
     
     private void getDeadline(){

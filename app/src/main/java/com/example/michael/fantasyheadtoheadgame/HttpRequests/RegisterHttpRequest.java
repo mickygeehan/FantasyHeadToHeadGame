@@ -75,7 +75,7 @@ public class RegisterHttpRequest extends AsyncTask<Void, Void, String> {
         System.out.println("onPost"+result);
       //  asyncDialog.dismiss();
         mClient.close();
-        Register.onBackgroundTaskDataObtained(result);
+
 
 
     }

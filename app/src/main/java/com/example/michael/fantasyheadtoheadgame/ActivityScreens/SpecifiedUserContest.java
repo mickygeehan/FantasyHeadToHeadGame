@@ -1,13 +1,17 @@
 package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.volley.RequestQueue;
 import com.example.michael.fantasyheadtoheadgame.Classes.Game;
+import com.example.michael.fantasyheadtoheadgame.Classes.MySingleton;
+import com.example.michael.fantasyheadtoheadgame.Classes.RequestResponseParser;
 import com.example.michael.fantasyheadtoheadgame.R;
 
 import java.util.ArrayList;
@@ -18,11 +22,11 @@ public class SpecifiedUserContest extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_specified_user_contest);
-
+        
         Intent i = getIntent();
         ArrayList<Game> allGames = (ArrayList<Game>) i.getSerializableExtra("listGames");
-        String currentUser = (String)i.getStringExtra("currentUser");
-        String opponent = (String)i.getStringExtra("opponent");
+        String currentUser = i.getStringExtra("currentUser");
+        String opponent = i.getStringExtra("opponent");
         
         initialiseAllFields(currentUser,allGames,opponent);
         

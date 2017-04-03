@@ -18,6 +18,8 @@ public class Constants {
     public static String SENDINVITE_ADDRESS = IP_ADDRESS+"FindSpecifiedHeadToHeadMatch.php?";
     public static String REPLY_TO_INVITE_ADDRESS = IP_ADDRESS+"ReplyToInvite.php?";
     public static String UPDATE_USERTEAM_ADDRESS = IP_ADDRESS+"UpdateUserTeam.php?";
+    public static String SEARCH_ADDRESS = IP_ADDRESS+"SearchForPlayer.php?";
+    public static String GET_USER_CONTESTS = IP_ADDRESS+"GetUserMatches.php?";
 
 
     //Input error messages

@@ -1,12 +1,21 @@
 package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.example.michael.fantasyheadtoheadgame.Classes.MySingleton;
+import com.example.michael.fantasyheadtoheadgame.Classes.RequestResponseParser;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.CommonUtilityMethods;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.Constants;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.RegisterHttpRequest;
@@ -19,16 +28,56 @@ import com.example.michael.fantasyheadtoheadgame.UtilityClasses.SecurityMethods;
  */
 
 public class Register extends Activity {
-    private static Context context;
+
+    //Volley variables
+    private RequestQueue queue;
+    private RequestResponseParser responseParser;
+    private ProgressDialog progressD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
-        context = Register.this;
+
+        //initialise request
+        queue = MySingleton.getInstance(this.getApplicationContext()).
+                getRequestQueue();
+
+        if(!initialiseParser()){
+            responseParser = new RequestResponseParser();
+        }
     }
 
+    private boolean initialiseParser(){
+        responseParser = (RequestResponseParser) getIntent().getSerializableExtra("parser");
+        if(responseParser!=null ){
+            return true;
+        }else{
+            return false;
+
+        }
+    }
+    
+    private boolean registerUserRequest(String appendToUrl){
+        String url =Constants.REGISTER_ADDRESS+appendToUrl;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                         CommonUtilityMethods.displayToast(getApplicationContext(),response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+        return true;
+    }
+    
     public void register(View view){
+        String appendToUrl = "";
         EditText userNameEditText = (EditText)findViewById(R.id.regUsername);
         EditText emailEditText = (EditText)findViewById(R.id.regEmail);
         EditText fullNameEditText = (EditText)findViewById(R.id.regFullName);
@@ -48,9 +97,10 @@ public class Register extends Activity {
                     if(SecurityMethods.isCleanInput(fullName)) {
 
                         if (passwordsMatch(password1, password2)) {
-
-                            RegisterHttpRequest reg = new RegisterHttpRequest(context, userName, SecurityMethods.hashPassword(password1), email, fullName);
-                            reg.execute();
+                            appendToUrl = "userN="+userName+"&password="+SecurityMethods.hashPassword(password1)+"&email="+email+"&fullN="+fullName;
+                            
+                            registerUserRequest(appendToUrl);
+                            
                         } else {
                             CommonUtilityMethods.displayToast(getApplicationContext(),"Password's do not match!");
                         }
@@ -95,17 +145,17 @@ public class Register extends Activity {
         return pass1.equals(pass2);
     }
 
-    //Data back from RegisterHttpRequest
-    public static void onBackgroundTaskDataObtained(String result) {
-        if(result == null){
-            Toast.makeText(context,"Server Issue",
-                    Toast.LENGTH_LONG).show();
-        }else{
-            Toast.makeText(context,result,
-                    Toast.LENGTH_LONG).show();
-        }
-        
-
-
-    }
+//    //Data back from RegisterHttpRequest
+//    public static void onBackgroundTaskDataObtained(String result) {
+//        if(result == null){
+//            Toast.makeText(context,"Server Issue",
+//                    Toast.LENGTH_LONG).show();
+//        }else{
+//            Toast.makeText(context,result,
+//                    Toast.LENGTH_LONG).show();
+//        }
+//        
+//
+//
+//    }
 }

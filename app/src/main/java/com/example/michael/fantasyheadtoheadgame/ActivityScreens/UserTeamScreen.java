@@ -47,19 +47,24 @@ public class UserTeamScreen extends AppCompatActivity  {
     
     //User class
     private User golbalUser;
+    
     //user players
     private ArrayList<Player> playersInTeam;
     private HashMap<String, Player> playerMap;
     private ArrayList<String> playersNames;
     private ArrayList<String> subOptions;
+    
     //num of players in pos
     private int numDef,numMid,numAtt = 0;
     private int budget = 0;
 
+    //For volley requests
     private RequestQueue queue;
     private RequestResponseParser responseParser;
     private ProgressDialog progressD;
+    
 
+    //Override methods from Android Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +78,7 @@ public class UserTeamScreen extends AppCompatActivity  {
             public void onClick(View view) {
                 Snackbar.make(view, "Saved your team", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                updateUserTeamInDB(golbalUser.getBudget());
+                generateUpdateTeamURL(golbalUser.getBudget());
             }
         });
         
@@ -88,75 +93,18 @@ public class UserTeamScreen extends AppCompatActivity  {
         //get user
         User user = (User) getIntent().getSerializableExtra("UserClass");
         golbalUser = user;
-        
-        //getSupportActionBar().setTitle("Your Team \t\tBudget: "+u.getBudget());
-        getHeadToHeadInvites();
-        getBudget();
-        callGetUserTeam(golbalUser.getId());
-    }
-    
 
-    private boolean initialiseParser(){
-        responseParser = (RequestResponseParser) getIntent().getSerializableExtra("parser");
-        if(responseParser!=null ){
-            return true;
-        }else{
-            return false;
-
-        }
-    }
-    
-    private void getHeadToHeadInvites(){
-        //checks if you have any head to head invites
-        String url =Constants.CHECKINVITES_ADDRESS+"username="+golbalUser.getUsername()+"&userID="+golbalUser.getId();
-        System.out.println(url);
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response){
-                        processInvites(response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
-            }
-        });
-        queue.add(stringRequest);
-        
-        
-        
-    }
-    
-    
-    private void getBudget(){
-//        GetBudgetHTTPRequest getBudget = new GetBudgetHTTPRequest(this,golbalUser.getId());
-//        getBudget.delegate = this;
-//        getBudget.execute();
-
-        //start url request
-        String url =Constants.BUDGET_ADDRESS+"userID="+golbalUser.getId();
-        System.out.println(url);
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response){
-                        processUserUpdate(response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
-            }
-        });
-        queue.add(stringRequest);
+        startProgressBar();
+        getHeadToHeadInvitesRequest();
+        getBudgetRequest();
+        callGetUserTeamRequest(golbalUser.getId());
     }
     
     @Override
     protected void onRestart() {
         super.onRestart();
         
-        callGetUserTeam(golbalUser.getId());
+        callGetUserTeamRequest(golbalUser.getId());
     }
 
     @Override
@@ -165,48 +113,83 @@ public class UserTeamScreen extends AppCompatActivity  {
         
     }
 
-    private void sortPlayerNames(){
-        //sort them
-
-        boolean playerAdded = false;
-        int x=1;
-        int temp = 0;
-
-        playersNames.clear();
-
-        //sort function
-        for(int i=0;i < playersInTeam.size();i++){
-
-            while(!playerAdded){
-
-                if(playersInTeam.get(temp).getPosInTeam() == x){
-                    playersNames.add(playersInTeam.get(temp).getWebName());
-                    playerAdded =true;
-                    temp = 0;
-                    x = x + 1;
-                }else{
-                    temp = temp + 1;
-                }
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if(resultCode == RESULT_OK) {
+                int updateBudget=data.getIntExtra("budget",0);
+                golbalUser.setBudget(updateBudget);
+                generateUpdateTeamURL(golbalUser.getBudget());
+                getSupportActionBar().setTitle("Your Team \t\tBudget: "+golbalUser.getBudget());
             }
-            playerAdded = false;
-
         }
-        
     }
     
-    private void callGetUserTeam(int userID){
-//        GetUserTeamHttpRequest getWeeklyTeam = new GetUserTeamHttpRequest(this,userID);
-//        getWeeklyTeam.delegate = this;
-//        getWeeklyTeam.execute();
+    
+    //Data requests using Volley
+    private boolean getBudgetRequest(){
+        String url =Constants.BUDGET_ADDRESS+"userID="+golbalUser.getId();
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        //processUserUpdate(response);
+                        if(response != ""){
+                            budget = responseParser.parseBudget(response);
+                            golbalUser.setBudget(budget);
+                            getSupportActionBar().setTitle("Your Team \t\t\t\t\t\t\tBudget: "+budget);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+        
+        return true;
+    }
+
+    private boolean getHeadToHeadInvitesRequest(){
+        String url =Constants.CHECKINVITES_ADDRESS+"username="+golbalUser.getUsername()+"&userID="+golbalUser.getId();
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        
+                        if(responseParser.parseInvites(response)){
+                            showInvitePopup(response);
+                        }
+                        
+                        
+                        
+                        //processInvites(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+
+        return true;
+
+    }
+
+    private boolean callGetUserTeamRequest(int userID){
         String url =Constants.USERTEAM_ADDRESS+"userID="+golbalUser.getId();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response){
-                        System.out.println(response);
                         ArrayList<Player> usersPlayers = responseParser.parseUserTeamResponse(response);
-                        processFinish(usersPlayers);
+                        //once got players then initialise fields
+                        initialiseTeamVariables(usersPlayers);
+                        initialiseFields();
+                        progressD.cancel();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -215,109 +198,12 @@ public class UserTeamScreen extends AppCompatActivity  {
             }
         });
         queue.add(stringRequest);
-        
-        
-        
-    }
 
-    public void openSearchScreen(View view){
-        Intent intent = new Intent(UserTeamScreen.this, SearchPlayers.class);
-        intent.putExtra("numberPlayers", playersInTeam.size());
-        intent.putExtra("userID", golbalUser.getId());
-        intent.putExtra("budget", golbalUser.getBudget());
-        startActivityForResult(intent,1);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-            super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1) {
-            if(resultCode == RESULT_OK) {
-                int updateBudget=data.getIntExtra("budget",0);
-                golbalUser.setBudget(updateBudget);
-                updateUserTeamInDB(golbalUser.getBudget());
-                getSupportActionBar().setTitle("Your Team \t\tBudget: "+golbalUser.getBudget());
-            }
-        }
-    }
-
-    public void findHeadToHead(View view){
-        final EditText input = new EditText(this);
-        input.setHint("Friends Username");
-        AlertDialog.Builder builder = new AlertDialog.Builder(UserTeamScreen.this);
-        builder.setView(input);
-        builder.setTitle("Find H2H Contest")
-                .setNeutralButton("Send Invite", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        SendHeadToHeadInviteHttpRequest sendH2HInvite = new SendHeadToHeadInviteHttpRequest(UserTeamScreen.this,golbalUser.getId(),golbalUser.getUsername(),input.getText().toString());
-//                        sendH2HInvite.delegate = UserTeamScreen.this;
-//                        sendH2HInvite.execute();
-                        sendInviteToUser(input.getText().toString());
-                    }
-
-                })
-                .setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        
-                    }
-
-                })
-                .setNegativeButton("Random", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        FindHeadToHeadMatchHttpRequest findH2H = new FindHeadToHeadMatchHttpRequest(UserTeamScreen.this,golbalUser.getId(),golbalUser.getUsername());
-//                        findH2H.delegate = UserTeamScreen.this;
-//                        findH2H.execute();
-                        
-                          findRandomContest();
-                    }
-
-                });
-        builder.show();
-        
-    }
-    
-    private boolean sendInviteToUser(String opponent){
-        String url =Constants.SENDINVITE_ADDRESS+"fromUsername="+golbalUser.getUsername()+"&userID="+golbalUser.getId()+"&toUsername="+opponent;
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response){
-                        ArrayList<Player> usersPlayers = responseParser.parseUserTeamResponse(response);
-                        processFinish(usersPlayers);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
-            }
-        });
-        queue.add(stringRequest);
         return true;
+
     }
-    
-    private boolean findRandomContest(){
-        String url =Constants.FINDCONTEST_ADDRESS+"username="+golbalUser.getUsername()+"&userID="+golbalUser.getId();
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response){
-                        ArrayList<Player> usersPlayers = responseParser.parseUserTeamResponse(response);
-                        processFinish(usersPlayers);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
-            }
-        });
-        queue.add(stringRequest);
-        return true;
-    }
-    
-    private boolean replyToInvite(String sentBy){
+
+    private boolean replyToInviteRequest(String sentBy){
         String url =Constants.REPLY_TO_INVITE_ADDRESS+"acceptedUserID="+golbalUser.getId()+"&fromUsername="+sentBy+"&toUsername="+golbalUser.getUsername();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -334,14 +220,50 @@ public class UserTeamScreen extends AppCompatActivity  {
         queue.add(stringRequest);
         return true;
     }
-    
+
+    private boolean findRandomContestRequest(){
+        String url =Constants.FINDCONTEST_ADDRESS+"username="+golbalUser.getUsername()+"&userID="+golbalUser.getId();
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        CommonUtilityMethods.displayToast(getApplicationContext(),response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+        return true;
+    }
+
+    private boolean sendInviteToUserRequest(String opponent){
+        String url =Constants.SENDINVITE_ADDRESS+"fromUsername="+golbalUser.getUsername()+"&userID="+golbalUser.getId()+"&toUsername="+opponent;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        CommonUtilityMethods.displayToast(getApplicationContext(),response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+        return true;
+    }
+
     private boolean updateUserTeamRequest(String addedUrl){
         String url =Constants.UPDATE_USERTEAM_ADDRESS+addedUrl;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response){
-                       // CommonUtilityMethods.displayToast(getApplicationContext(),response);
+                        // CommonUtilityMethods.displayToast(getApplicationContext(),response);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -354,6 +276,185 @@ public class UserTeamScreen extends AppCompatActivity  {
     }
     
     
+    //Button click methods
+    public void openSearchScreen(View view){
+        Intent intent = new Intent(UserTeamScreen.this, SearchPlayers.class);
+        intent.putExtra("numberPlayers", playersInTeam.size());
+        intent.putExtra("userID", golbalUser.getId());
+        intent.putExtra("budget", golbalUser.getBudget());
+        intent.putExtra("parser",responseParser);
+        startActivityForResult(intent,1);
+    }
+    
+    public void findHeadToHead(View view){
+        final EditText input = new EditText(this);
+        input.setHint("Friends Username");
+        AlertDialog.Builder builder = new AlertDialog.Builder(UserTeamScreen.this);
+        builder.setView(input);
+        builder.setTitle("Find H2H Contest")
+                .setNeutralButton("Send Invite", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        SendHeadToHeadInviteHttpRequest sendH2HInvite = new SendHeadToHeadInviteHttpRequest(UserTeamScreen.this,golbalUser.getId(),golbalUser.getUsername(),input.getText().toString());
+//                        sendH2HInvite.delegate = UserTeamScreen.this;
+//                        sendH2HInvite.execute();
+                        sendInviteToUserRequest(input.getText().toString());
+                    }
+
+                })
+                .setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+
+                })
+                .setNegativeButton("Random", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        FindHeadToHeadMatchHttpRequest findH2H = new FindHeadToHeadMatchHttpRequest(UserTeamScreen.this,golbalUser.getId(),golbalUser.getUsername());
+//                        findH2H.delegate = UserTeamScreen.this;
+//                        findH2H.execute();
+
+                        findRandomContestRequest();
+                    }
+
+                });
+        builder.show();
+
+    }
+
+    public void generateUpdateTeamURL(int budget){
+
+        sortPlayerNames();
+        String url = "";
+        int i = 1;
+
+        for(String name : playersNames){
+            Player pl = playerMap.get(name);
+            url = url + "player"+i+"="+pl.getId()+"&";
+            i++;
+        }
+        url = url+"userID="+golbalUser.getId()+"&budget="+budget;
+
+        updateUserTeamRequest(url);
+
+    }
+
+    public void changePlayer(View view){
+
+        //get name
+        TextView playerLabel = null;
+        Player selectedPlayer = null;
+
+
+        switch(view.getId())
+        {
+            case R.id.xmlchangePlayer1Bt:
+                // Code for button 1 click
+                playerLabel = (TextView)findViewById(R.id.xmlPlayer1Name);
+                selectedPlayer = playerMap.get(playerLabel.getText().toString());
+                break;
+
+            case R.id.imageButton4:
+                // Code for button 2 click
+                playerLabel = (TextView)findViewById(R.id.xmlPlayer2Name);
+                selectedPlayer = playerMap.get(playerLabel.getText().toString());
+                break;
+
+            case R.id.imageButton5:
+                // Code for button 3 click
+                playerLabel = (TextView)findViewById(R.id.xmlPlayer3Name);
+                selectedPlayer = playerMap.get(playerLabel.getText().toString());
+                break;
+            case R.id.imageButton6:
+                // Code for button 3 click
+                playerLabel = (TextView)findViewById(R.id.xmlPlayer4Name);
+                selectedPlayer = playerMap.get(playerLabel.getText().toString());
+                break;
+            case R.id.imageButton7:
+                // Code for button 3 click
+                playerLabel = (TextView)findViewById(R.id.xmlPlayer5Name);
+                selectedPlayer = playerMap.get(playerLabel.getText().toString());
+                break;
+            case R.id.imageButton8:
+                // Code for button 3 click
+                playerLabel = (TextView)findViewById(R.id.xmlPlayer6Name);
+                selectedPlayer = playerMap.get(playerLabel.getText().toString());
+                break;
+            case R.id.imageButton9:
+                // Code for button 3 click
+                playerLabel = (TextView)findViewById(R.id.xmlPlayer7Name);
+                selectedPlayer = playerMap.get(playerLabel.getText().toString());
+                break;
+            case R.id.imageButton10:
+                // Code for button 3 click
+                playerLabel = (TextView)findViewById(R.id.xmlPlayer8Name);
+                selectedPlayer = playerMap.get(playerLabel.getText().toString());
+                break;
+            case R.id.imageButton11:
+                // Code for button 3 click
+                playerLabel = (TextView)findViewById(R.id.xmlPlayer9Name);
+                selectedPlayer = playerMap.get(playerLabel.getText().toString());
+                break;
+            case R.id.imageButton12:
+                // Code for button 3 click
+                playerLabel = (TextView)findViewById(R.id.xmlPlayer10Name);
+                selectedPlayer = playerMap.get(playerLabel.getText().toString());
+                break;
+            case R.id.imageButton13:
+                // Code for button 3 click
+                playerLabel = (TextView)findViewById(R.id.xmlPlayer11Name);
+                selectedPlayer = playerMap.get(playerLabel.getText().toString());
+
+//                
+                break;
+        }
+
+        //clear old sub options and get new ones for new player
+        subOptions.clear();
+        getSubOptions(selectedPlayer);
+
+        //displaypopup
+        showSubOptions(selectedPlayer,playerLabel);
+
+    }
+    
+    
+    //initialise methods
+    public void initialiseTeamVariables(ArrayList<Player> players) {
+        //initialise variables
+        playersInTeam = players;
+        playersNames = new ArrayList<>();
+        playerMap = new HashMap<>();
+        subOptions = new ArrayList<>();
+
+        for(Player p: players){
+            playersNames.add(p.getWebName());
+            playerMap.put(p.getWebName(),p);
+            if(p.getPlayerPosition() == 2){
+                numDef = numDef+1;
+            }else if(p.getPlayerPosition() == 3){
+                numMid = numMid+1;
+            }else if(p.getPlayerPosition() == 4){
+                numAtt = numAtt+1;
+            }
+        }
+
+        
+
+    }
+    
+    private boolean initialiseParser(){
+        responseParser = (RequestResponseParser) getIntent().getSerializableExtra("parser");
+        if(responseParser!=null ){
+            return true;
+        }else{
+            return false;
+
+        }
+    }
+
     private void initialiseFields(){
         TextView player1Label = (TextView)findViewById(R.id.xmlPlayer1Name);
         TextView player2Label = (TextView)findViewById(R.id.xmlPlayer2Name);
@@ -378,23 +479,68 @@ public class UserTeamScreen extends AppCompatActivity  {
         player9Label.setText(playersNames.get(8));
         player10Label.setText(playersNames.get(9));
         player11Label.setText(playersNames.get(10));
-        
+
         initialiseImages();
 
     }
-    
+
     private void initialiseImages(){
-        
+
         for(int i=1; i <=10;i++){
-            
+
             Player p = playerMap.get(playersNames.get(i));
             int playerTeam = p.getTeamCode();
             setImage(playerTeam,i);
-            
-       
+
+
         }
-        
-        
+
+
+    }
+    
+    
+    //methods set the images based on team id and position in team
+    //for eg. if player pos = 2 then gets imagebutton 4
+    private ImageButton getImageButton(int posInTeam){
+        ImageButton im = null;
+
+        switch(posInTeam){
+            case 1:
+                im = (ImageButton)findViewById(R.id.imageButton4);
+                break;
+            case 2:
+                im = (ImageButton)findViewById(R.id.imageButton5);
+                break;
+            case 3:
+                im = (ImageButton)findViewById(R.id.imageButton6);
+                break;
+            case 4:
+                im = (ImageButton)findViewById(R.id.imageButton7);
+                break;
+            case 5:
+                im = (ImageButton)findViewById(R.id.imageButton8);
+                break;
+            case 6:
+                im = (ImageButton)findViewById(R.id.imageButton9);
+                break;
+            case 7:
+                im = (ImageButton)findViewById(R.id.imageButton10);
+                break;
+            case 8:
+                im = (ImageButton)findViewById(R.id.imageButton11);
+                break;
+            case 9:
+                im = (ImageButton)findViewById(R.id.imageButton12);
+                break;
+            case 10:
+                im = (ImageButton)findViewById(R.id.imageButton13);
+                break;
+            default:
+                break;
+
+        }
+
+        return im;
     }
     
     private void setImage(int playerTeam,int posInTeam){
@@ -484,103 +630,45 @@ public class UserTeamScreen extends AppCompatActivity  {
                 break;
         }
     }
-    
-    private ImageButton getImageButton(int posInTeam){
-        ImageButton im = null;
-        
-        switch(posInTeam){
-            case 1:
-                im = (ImageButton)findViewById(R.id.imageButton4);
-                break;
-            case 2:
-                im = (ImageButton)findViewById(R.id.imageButton5);
-                break;
-            case 3:
-                im = (ImageButton)findViewById(R.id.imageButton6);
-                break;
-            case 4:
-                im = (ImageButton)findViewById(R.id.imageButton7);
-                break;
-            case 5:
-                im = (ImageButton)findViewById(R.id.imageButton8);
-                break;
-            case 6:
-                im = (ImageButton)findViewById(R.id.imageButton9);
-                break;
-            case 7:
-                im = (ImageButton)findViewById(R.id.imageButton10);
-                break;
-            case 8:
-                im = (ImageButton)findViewById(R.id.imageButton11);
-                break;
-            case 9:
-                im = (ImageButton)findViewById(R.id.imageButton12);
-                break;
-            case 10:
-                im = (ImageButton)findViewById(R.id.imageButton13);
-                break;
-            default:
-                break;
 
-        }
-        
-        return im;
-    }
-    
-    public void processFinish(ArrayList<Player> players) {
-        //initialise variables
-        playersInTeam = players;
-        playersNames = new ArrayList<>();
-        playerMap = new HashMap<>();
-        subOptions = new ArrayList<>();
 
-        for(Player p: players){
-            playersNames.add(p.getWebName());
-            playerMap.put(p.getWebName(),p);
-            if(p.getPlayerPosition() == 2){
-                numDef = numDef+1;
-            }else if(p.getPlayerPosition() == 3){
-                numMid = numMid+1;
-            }else if(p.getPlayerPosition() == 4){
-                numAtt = numAtt+1;
+    //general methods & popups
+    private void sortPlayerNames(){
+        //this function sorts the players in users team by position in team
+        //This is to ensure that the players are put into the db in the right position
+
+        boolean playerAdded = false;
+        int x=1;
+        int temp = 0;
+        playersNames.clear();
+
+        //sort function
+        for(int i=0;i < playersInTeam.size();i++){
+            while(!playerAdded){
+                if(playersInTeam.get(temp).getPosInTeam() == x){
+                    playersNames.add(playersInTeam.get(temp).getWebName());
+                    playerAdded =true;
+                    temp = 0;
+                    x = x + 1;
+                }else{
+                    temp = temp + 1;
+                }
+
             }
+            playerAdded = false;
+
         }
-        
-        initialiseFields();
-        
+
     }
     
-    public void processUserUpdate(String result) {
-        if(result != ""){
-            try {
-                budget = Integer.valueOf(result);
-                golbalUser.setBudget(budget);
-                getSupportActionBar().setTitle("Your Team \t\tBudget: "+budget);
-            } catch(NumberFormatException e) {
-                Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
-            } catch(NullPointerException e) {
-                
-            }
-        }
-       
-        
-    }
-
-   
-
-
-    public void processInvites(final String sentBy) {
-        if(!sentBy.contains("You have no")){
+    public void showInvitePopup(final String sentBy) {
             AlertDialog.Builder builder = new AlertDialog.Builder(UserTeamScreen.this);
             builder.setTitle("Received H2H Invite from: "+sentBy)
 
                     .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-//                            ReplyToInviteHttpRequest replyH2H = new ReplyToInviteHttpRequest(UserTeamScreen.this,golbalUser.getId(),sentBy,golbalUser.getUsername());
-//                            replyH2H.delegate = UserTeamScreen.this;
-//                            replyH2H.execute();
-                            replyToInvite(sentBy);
+                            replyToInviteRequest(sentBy);
                         }
 
                     })
@@ -592,93 +680,11 @@ public class UserTeamScreen extends AppCompatActivity  {
 
                     });
             builder.show();
-        }
+        
         
     }
     
-    
-    
-
-    public void changePlayer(View view){
-
-        //get name
-         TextView playerLabel = null;
-         Player selectedPlayer = null;
-
-
-        switch(view.getId())
-        {
-            case R.id.xmlchangePlayer1Bt:
-                // Code for button 1 click
-                playerLabel = (TextView)findViewById(R.id.xmlPlayer1Name);
-                selectedPlayer = playerMap.get(playerLabel.getText().toString());
-                break;
-
-            case R.id.imageButton4:
-                // Code for button 2 click
-                playerLabel = (TextView)findViewById(R.id.xmlPlayer2Name);
-                selectedPlayer = playerMap.get(playerLabel.getText().toString());
-                break;
-
-            case R.id.imageButton5:
-                // Code for button 3 click
-                playerLabel = (TextView)findViewById(R.id.xmlPlayer3Name);
-                selectedPlayer = playerMap.get(playerLabel.getText().toString());
-                break;
-            case R.id.imageButton6:
-                // Code for button 3 click
-                playerLabel = (TextView)findViewById(R.id.xmlPlayer4Name);
-                selectedPlayer = playerMap.get(playerLabel.getText().toString());
-                break;
-            case R.id.imageButton7:
-                // Code for button 3 click
-                playerLabel = (TextView)findViewById(R.id.xmlPlayer5Name);
-                selectedPlayer = playerMap.get(playerLabel.getText().toString());
-                break;
-            case R.id.imageButton8:
-                // Code for button 3 click
-                playerLabel = (TextView)findViewById(R.id.xmlPlayer6Name);
-                selectedPlayer = playerMap.get(playerLabel.getText().toString());
-                break;
-            case R.id.imageButton9:
-                // Code for button 3 click
-                playerLabel = (TextView)findViewById(R.id.xmlPlayer7Name);
-                selectedPlayer = playerMap.get(playerLabel.getText().toString());
-                break;
-            case R.id.imageButton10:
-                // Code for button 3 click
-                playerLabel = (TextView)findViewById(R.id.xmlPlayer8Name);
-                selectedPlayer = playerMap.get(playerLabel.getText().toString());
-                break;
-            case R.id.imageButton11:
-                // Code for button 3 click
-                playerLabel = (TextView)findViewById(R.id.xmlPlayer9Name);
-                selectedPlayer = playerMap.get(playerLabel.getText().toString());
-                break;
-            case R.id.imageButton12:
-                // Code for button 3 click
-                playerLabel = (TextView)findViewById(R.id.xmlPlayer10Name);
-                selectedPlayer = playerMap.get(playerLabel.getText().toString());
-                break;
-            case R.id.imageButton13:
-                // Code for button 3 click
-                playerLabel = (TextView)findViewById(R.id.xmlPlayer11Name);
-                selectedPlayer = playerMap.get(playerLabel.getText().toString());
-
-//                
-                break;
-        }
-        
-        //clear old sub options and get new ones for new player
-        subOptions.clear();
-        getSubOptions(selectedPlayer);
-        
-        //displaypopup
-        displayPopUp(selectedPlayer,playerLabel);
-        
-    }
-    
-    private void displayPopUp(final Player selectedPlayer,final TextView playerLabel){
+    private void showSubOptions(final Player selectedPlayer,final TextView playerLabel){
         //inflate layout for popup
         LayoutInflater inflater = getLayoutInflater();
         View alertLayout = inflater.inflate(R.layout.popup, null);
@@ -713,12 +719,7 @@ public class UserTeamScreen extends AppCompatActivity  {
                         playerToSwap.setPosInTeam(currentPosInTeam);
 
                         updateLabelFieldsAfterSwap(playerLabel,playerToSwap.getWebName(),playerToSwap);
-
-
-                        Toast.makeText(getApplicationContext(),"You have now subbed in this player!",
-                                Toast.LENGTH_LONG).show();
-
-
+                        
 
                     }
                 })
@@ -751,24 +752,17 @@ public class UserTeamScreen extends AppCompatActivity  {
         
     }
 
-    public void updateUserTeamInDB(int budget){
-        
-        sortPlayerNames();
-        String url = "";
-        int i = 1;
-
-        for(String name : playersNames){
-            Player pl = playerMap.get(name);
-            url = url + "player"+i+"="+pl.getId()+"&";
-            i++;
+    private boolean startProgressBar(){
+        progressD = new ProgressDialog(this);
+        if(progressD != null){
+            progressD.setMessage("Loading...");
+            progressD.show();
+            return true;
         }
-        url = url+"userID="+golbalUser.getId()+"&budget="+budget;
 
-//        UpdateUserTeamHttpResponse getWeeklyTeam = new UpdateUserTeamHttpResponse(UserTeamScreen.this,url);
-//        getWeeklyTeam.delegate = this;
-//        getWeeklyTeam.execute();
-        updateUserTeamRequest(url);
-        
-        
+        return false;
+
     }
+
+    
 }

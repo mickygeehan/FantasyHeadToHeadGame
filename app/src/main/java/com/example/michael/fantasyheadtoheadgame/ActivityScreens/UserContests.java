@@ -1,5 +1,6 @@
 package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,23 +12,37 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.example.michael.fantasyheadtoheadgame.Classes.Game;
+import com.example.michael.fantasyheadtoheadgame.Classes.MySingleton;
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
+import com.example.michael.fantasyheadtoheadgame.Classes.RequestResponseParser;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.GetUserMatchesHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 import com.example.michael.fantasyheadtoheadgame.R;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.CommonUtilityMethods;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.Constants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class UserContests extends AppCompatActivity implements UserTeamAsyncResponse {
+public class UserContests extends AppCompatActivity{
     
     private ListView lv;
     private String username;
     private HashMap<String,User> matches = new HashMap<>();
     private ArrayList<Game> allGames;
     private ArrayList<String> opponents;
+
+    //Volley variables
+    private RequestQueue queue;
+    private RequestResponseParser responseParser;
+    private ProgressDialog progressD;
     
 
     @Override
@@ -37,8 +52,14 @@ public class UserContests extends AppCompatActivity implements UserTeamAsyncResp
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        
-        
+        //initialise request
+        queue = MySingleton.getInstance(this.getApplicationContext()).
+                getRequestQueue();
+
+        if(!initialiseParser()){
+            responseParser = new RequestResponseParser();
+        }
+
         
         //finds the listview to display opponents
         lv = (ListView)findViewById(R.id.xmlUMlistview);
@@ -80,24 +101,37 @@ public class UserContests extends AppCompatActivity implements UserTeamAsyncResp
         
         
     }
+
+    private boolean initialiseParser(){
+        responseParser = (RequestResponseParser) getIntent().getSerializableExtra("parser");
+        if(responseParser!=null ){
+            return true;
+        }else{
+            return false;
+
+        }
+    }
     
-    private void getOpponentsHttpCall(User user){
-        GetUserMatchesHttpRequest getMatches = new GetUserMatchesHttpRequest(UserContests.this,user.getId(),user.getUsername());
-        getMatches.delegate = this;
-        getMatches.execute();
+    private boolean getOpponentsHttpCall(User user){
+
+        String url = Constants.GET_USER_CONTESTS+"userID="+user.getId()+"&username="+user.getUsername();
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        ArrayList<User> users = responseParser.parseUserContests(response);
+                        processUserMatches(users);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+        return true;
     }
 
-    @Override
-    public void processFinish(ArrayList<Player> players) {
-        
-    }
-
-    @Override
-    public void processUserUpdate(String result) {
-
-    }
-
-    @Override
     public void processUserMatches(ArrayList<User> users) {
         
         //Get all games used for on click
@@ -109,20 +143,7 @@ public class UserContests extends AppCompatActivity implements UserTeamAsyncResp
         for(String s: opponents){
 
         }
-
         
-        
-        
-        //display all results WORKING
-//        for(int i =0;i<users.size()-1;i++){
-//            matchedUsersAdap.add(users.get(i).getUsername()+" "+ users.get(i).getPoints() + " - "+ users.get(i+1).getPoints()
-//                    +" "+ users.get(i+1).getUsername());
-//            Game g = new Game(users.get(i),users.get(i+1));
-//            allGames.add(g);
-//            i++;
-//            
-//        }
-
         //sets the listview to display opponents
         if(opponents.size() > 0) {
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
@@ -161,18 +182,4 @@ public class UserContests extends AppCompatActivity implements UserTeamAsyncResp
         return opponents;
     }
 
-    @Override
-    public void processLogin(User user) {
-        
-    }
-
-    @Override
-    public void processInvites(String sentBy) {
-        
-    }
-
-    @Override
-    public void processDate(String epochDate) {
-        
-    }
 }

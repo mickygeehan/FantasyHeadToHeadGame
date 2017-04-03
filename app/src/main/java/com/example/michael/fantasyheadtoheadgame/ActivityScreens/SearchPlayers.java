@@ -2,6 +2,7 @@ package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,22 +15,37 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.example.michael.fantasyheadtoheadgame.Classes.MySingleton;
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
+import com.example.michael.fantasyheadtoheadgame.Classes.RequestResponseParser;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.UpdateUserTeamHttpResponse;
 import com.example.michael.fantasyheadtoheadgame.R;
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.SearchPlayerHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.CommonUtilityMethods;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.Constants;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
+public class SearchPlayers extends Activity{
     
     //Global Variables
     private ArrayList<Player> searchResults;
     private ListView searchResultsLv;
     private int sizeOfTeam = 0;
     private int budget = 0;
+
+    //Volley variables
+    private RequestQueue queue;
+    private RequestResponseParser responseParser;
+    private ProgressDialog progressD;
     
 
     @Override
@@ -41,6 +57,14 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
         sizeOfTeam = (int) getIntent().getSerializableExtra("numberPlayers");
         final int userID = (int)getIntent().getSerializableExtra("userID");
         budget =  (int)getIntent().getSerializableExtra("budget");
+
+        //initialise request
+        queue = MySingleton.getInstance(this.getApplicationContext()).
+                getRequestQueue();
+
+        if(!initialiseParser()){
+            responseParser = new RequestResponseParser();
+        }
         
         
         //initialising the listview and code for on click of listview
@@ -60,18 +84,15 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
                             .setPositiveButton("Buy", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     // continue with buy
-                                    System.out.println(budget);
-                                    System.out.println(searchResults.get(itemPosition).getCost());
+
                                     if(budget >= searchResults.get(itemPosition).getCost()){
                                         int playerId = searchResults.get(itemPosition).getId();
                                         int playerPositionInTeam = sizeOfTeam +1;
-                                        String url = "?player"+playerPositionInTeam+"="+playerId+"&userID="+userID;
-                                        System.out.println(url);
-                                        UpdateUserTeamHttpResponse getWeeklyTeam = new UpdateUserTeamHttpResponse(SearchPlayers.this,url);
-                                        getWeeklyTeam.delegate = SearchPlayers.this;
-                                        getWeeklyTeam.execute();
+                                        String urlToAppend = "player"+playerPositionInTeam+"="+playerId+"&userID="+userID;
+                                        updateUserTeamRequest(urlToAppend);
                                         sizeOfTeam = sizeOfTeam +1;
                                         budget = (int) (budget - searchResults.get(itemPosition).getCost());
+                                        CommonUtilityMethods.displayToast(getApplicationContext(),"Player added to team!");
            
                                     }else{
                                         Toast.makeText(getApplicationContext(),"Not enough money",Toast.LENGTH_LONG).show();
@@ -92,14 +113,63 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
         });
     }
 
+    private boolean updateUserTeamRequest(String addedUrl){
+        String url =Constants.UPDATE_USERTEAM_ADDRESS+addedUrl;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        // CommonUtilityMethods.displayToast(getApplicationContext(),response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+        return true;
+    }
+
+    private boolean searchPlayerRequest(String urlToAppend){
+        String url = Constants.SEARCH_ADDRESS+urlToAppend;
+        System.out.println(url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        ArrayList<Player> searchResults = responseParser.parseSearchResults(response);
+                        processFinish(searchResults);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+
+        return true;
+    }
+    
     //prevents sql injection
     public boolean isCleanInput(String s){
         String pattern= "^[a-zA-Z0-9]*$";
         return s.matches(pattern);
     }
 
+    private boolean initialiseParser(){
+        responseParser = (RequestResponseParser) getIntent().getSerializableExtra("parser");
+        if(responseParser!=null ){
+            return true;
+        }else{
+            return false;
 
+        }
+    }
+    
     public void searchForPlayer(View view){
+        String urlToAppend ="";
         EditText firstName = (EditText)findViewById(R.id.xmlFirstNameQuery);
         EditText webName = (EditText)findViewById(R.id.xmlSecondNameQuery);
         String fnStr = firstName.getText().toString();
@@ -110,25 +180,18 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
         if(fnStr.isEmpty() && wnStr.isEmpty()){
             displayToast("Please enter a search query");
         }else{
-            
             if(fnStr.isEmpty()){
                 if(isCleanInput(wnStr)){
-                    searchPlayersReq = new SearchPlayerHttpRequest(this,wnStr);
-                    searchPlayersReq.delegate = this;
-                    searchPlayersReq.execute();
+                    urlToAppend = "webName="+wnStr;
                 }
-                
             }else{
                 if(isCleanInput(wnStr)){
                     if(isCleanInput(fnStr)){
-                        searchPlayersReq = new SearchPlayerHttpRequest(this,wnStr,fnStr);
-                        searchPlayersReq.delegate = this;
-                        searchPlayersReq.execute();
+                        urlToAppend = "webName="+wnStr+"&firstName="+fnStr;
                     }
                 }
-                
             }
-            
+            searchPlayerRequest(urlToAppend);
         }
     }
 
@@ -146,7 +209,7 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
         finish();
     }
     
-    @Override
+
     public void processFinish(ArrayList<Player> players){
         searchResults = players;
         ArrayList<String> playersNames = new ArrayList<>();
@@ -167,29 +230,5 @@ public class SearchPlayers extends Activity implements UserTeamAsyncResponse {
         
     }
 
-    @Override
-    public void processUserUpdate(String result) {
-        Toast.makeText(getApplicationContext(),"Player Added to team",
-                Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void processUserMatches(ArrayList<User> users) {
-
-    }
-
-    @Override
-    public void processLogin(User user) {
-        
-    }
-
-    @Override
-    public void processInvites(String sentBy) {
-        
-    }
-
-    @Override
-    public void processDate(String epochDate) {
-        
-    }
+   
 }
