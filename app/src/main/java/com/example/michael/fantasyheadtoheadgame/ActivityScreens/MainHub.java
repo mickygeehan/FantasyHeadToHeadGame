@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -104,7 +105,7 @@ public class MainHub extends AppCompatActivity{
     @Override
     protected void onRestart() {
         super.onRestart();
-        checkUserLoggedIn();
+        //checkUserLoggedIn();
     }
     
     private void getDeadline(){
@@ -112,7 +113,7 @@ public class MainHub extends AppCompatActivity{
         startProgressBar();
         
         //start url request
-        String url ="http://"+ Constants.IP_ADDRESS+":8888/FantasyShowDown/GetDeadline.php";
+        String url =Constants.DEADLINE_ADDRESS;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -128,6 +129,11 @@ public class MainHub extends AppCompatActivity{
             }
         });
         queue.add(stringRequest);
+
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
     }
     
     private boolean startProgressBar(){

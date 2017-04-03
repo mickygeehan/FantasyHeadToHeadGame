@@ -99,7 +99,7 @@ public class Login extends AppCompatActivity{
     }
     
     public void sendLoginRequest(String userName,String passwordHashed){
-        String url ="http://"+ Constants.IP_ADDRESS+":8888/FantasyShowDown/login.php?userN="+userName+"&password="+passwordHashed;
+        String url = Constants.LOGIN_ADDRESS+"userN="+userName+"&password="+passwordHashed;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -151,7 +151,7 @@ public class Login extends AppCompatActivity{
                 .setPositiveButton("Change", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Constants.IP_ADDRESS = input.getText().toString();
+                        Constants.IP_ADDRESS = "http://"+input.getText().toString()+":8888/FantasyShowDown/";
                     }
 
                 })

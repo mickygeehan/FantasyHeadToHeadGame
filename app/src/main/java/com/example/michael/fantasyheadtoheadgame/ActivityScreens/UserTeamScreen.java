@@ -18,8 +18,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.michael.fantasyheadtoheadgame.Classes.MySingleton;
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.Classes.RequestResponseParser;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
@@ -32,14 +37,16 @@ import com.example.michael.fantasyheadtoheadgame.HttpRequests.SendHeadToHeadInvi
 import com.example.michael.fantasyheadtoheadgame.HttpRequests.UpdateUserTeamHttpResponse;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 import com.example.michael.fantasyheadtoheadgame.R;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.CommonUtilityMethods;
+import com.example.michael.fantasyheadtoheadgame.UtilityClasses.Constants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncResponse {
+public class UserTeamScreen extends AppCompatActivity  {
     
     //User class
-    private User u;
+    private User golbalUser;
     //user players
     private ArrayList<Player> playersInTeam;
     private HashMap<String, Player> playerMap;
@@ -66,12 +73,13 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
             public void onClick(View view) {
                 Snackbar.make(view, "Saved your team", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                updateUserTeamInDB(u.getBudget());
+                updateUserTeamInDB(golbalUser.getBudget());
             }
         });
         
         //initialise request
-        queue = Volley.newRequestQueue(this);
+        queue = MySingleton.getInstance(this.getApplicationContext()).
+                getRequestQueue();
         
         if(!initialiseParser()){
             responseParser = new RequestResponseParser();
@@ -79,14 +87,14 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
         
         //get user
         User user = (User) getIntent().getSerializableExtra("UserClass");
-        u = user;
+        golbalUser = user;
         
         //getSupportActionBar().setTitle("Your Team \t\tBudget: "+u.getBudget());
-        getHeadToHeadInvites(u.getUsername());
+        getHeadToHeadInvites();
         getBudget();
-        callGetUserTeam(u.getId());
-
+        callGetUserTeam(golbalUser.getId());
     }
+    
 
     private boolean initialiseParser(){
         responseParser = (RequestResponseParser) getIntent().getSerializableExtra("parser");
@@ -98,29 +106,57 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
         }
     }
     
-    private void getHeadToHeadInvites(String uName){
+    private void getHeadToHeadInvites(){
         //checks if you have any head to head invites
-        FindInvitesHttprequest findIn = new FindInvitesHttprequest(this,u.getId(),u.getUsername());
-        findIn.delegate = this;
-        findIn.execute();
+        String url =Constants.CHECKINVITES_ADDRESS+"username="+golbalUser.getUsername()+"&userID="+golbalUser.getId();
+        System.out.println(url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        processInvites(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+        
+        
+        
     }
     
     
     private void getBudget(){
-        GetBudgetHTTPRequest getBudget = new GetBudgetHTTPRequest(this,u.getId());
-        getBudget.delegate = this;
-        getBudget.execute();
+//        GetBudgetHTTPRequest getBudget = new GetBudgetHTTPRequest(this,golbalUser.getId());
+//        getBudget.delegate = this;
+//        getBudget.execute();
+
+        //start url request
+        String url =Constants.BUDGET_ADDRESS+"userID="+golbalUser.getId();
+        System.out.println(url);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        processUserUpdate(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
     }
     
     @Override
     protected void onRestart() {
         super.onRestart();
         
-        callGetUserTeam(u.getId());
-        
-        
-
-        
+        callGetUserTeam(golbalUser.getId());
     }
 
     @Override
@@ -160,17 +196,35 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
     }
     
     private void callGetUserTeam(int userID){
-        GetUserTeamHttpRequest getWeeklyTeam = new GetUserTeamHttpRequest(this,userID);
-        getWeeklyTeam.delegate = this;
-        getWeeklyTeam.execute();
+//        GetUserTeamHttpRequest getWeeklyTeam = new GetUserTeamHttpRequest(this,userID);
+//        getWeeklyTeam.delegate = this;
+//        getWeeklyTeam.execute();
+        String url =Constants.USERTEAM_ADDRESS+"userID="+golbalUser.getId();
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        System.out.println(response);
+                        ArrayList<Player> usersPlayers = responseParser.parseUserTeamResponse(response);
+                        processFinish(usersPlayers);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+        
+        
         
     }
 
     public void openSearchScreen(View view){
         Intent intent = new Intent(UserTeamScreen.this, SearchPlayers.class);
         intent.putExtra("numberPlayers", playersInTeam.size());
-        intent.putExtra("userID", u.getId());
-        intent.putExtra("budget", u.getBudget());
+        intent.putExtra("userID", golbalUser.getId());
+        intent.putExtra("budget", golbalUser.getBudget());
         startActivityForResult(intent,1);
     }
 
@@ -180,9 +234,9 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
         if (requestCode == 1) {
             if(resultCode == RESULT_OK) {
                 int updateBudget=data.getIntExtra("budget",0);
-                u.setBudget(updateBudget);
-                updateUserTeamInDB(u.getBudget());
-                getSupportActionBar().setTitle("Your Team \t\tBudget: "+u.getBudget());
+                golbalUser.setBudget(updateBudget);
+                updateUserTeamInDB(golbalUser.getBudget());
+                getSupportActionBar().setTitle("Your Team \t\tBudget: "+golbalUser.getBudget());
             }
         }
     }
@@ -196,41 +250,109 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
                 .setNeutralButton("Send Invite", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        SendHeadToHeadInviteHttpRequest sendH2HInvite = new SendHeadToHeadInviteHttpRequest(UserTeamScreen.this,u.getId(),u.getUsername(),input.getText().toString());
-                        sendH2HInvite.delegate = UserTeamScreen.this;
-                        sendH2HInvite.execute();
+//                        SendHeadToHeadInviteHttpRequest sendH2HInvite = new SendHeadToHeadInviteHttpRequest(UserTeamScreen.this,golbalUser.getId(),golbalUser.getUsername(),input.getText().toString());
+//                        sendH2HInvite.delegate = UserTeamScreen.this;
+//                        sendH2HInvite.execute();
+                        sendInviteToUser(input.getText().toString());
                     }
 
                 })
-                .setPositiveButton("Random", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        FindHeadToHeadMatchHttpRequest findH2H = new FindHeadToHeadMatchHttpRequest(UserTeamScreen.this,u.getId(),u.getUsername());
-                        findH2H.delegate = UserTeamScreen.this;
-                        findH2H.execute();
+                        
                     }
 
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton("Random", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
+//                        FindHeadToHeadMatchHttpRequest findH2H = new FindHeadToHeadMatchHttpRequest(UserTeamScreen.this,golbalUser.getId(),golbalUser.getUsername());
+//                        findH2H.delegate = UserTeamScreen.this;
+//                        findH2H.execute();
+                        
+                          findRandomContest();
                     }
 
                 });
         builder.show();
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
     }
+    
+    private boolean sendInviteToUser(String opponent){
+        String url =Constants.SENDINVITE_ADDRESS+"fromUsername="+golbalUser.getUsername()+"&userID="+golbalUser.getId()+"&toUsername="+opponent;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        ArrayList<Player> usersPlayers = responseParser.parseUserTeamResponse(response);
+                        processFinish(usersPlayers);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+        return true;
+    }
+    
+    private boolean findRandomContest(){
+        String url =Constants.FINDCONTEST_ADDRESS+"username="+golbalUser.getUsername()+"&userID="+golbalUser.getId();
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        ArrayList<Player> usersPlayers = responseParser.parseUserTeamResponse(response);
+                        processFinish(usersPlayers);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+        return true;
+    }
+    
+    private boolean replyToInvite(String sentBy){
+        String url =Constants.REPLY_TO_INVITE_ADDRESS+"acceptedUserID="+golbalUser.getId()+"&fromUsername="+sentBy+"&toUsername="+golbalUser.getUsername();
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        CommonUtilityMethods.displayToast(getApplicationContext(),response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+        return true;
+    }
+    
+    private boolean updateUserTeamRequest(String addedUrl){
+        String url =Constants.UPDATE_USERTEAM_ADDRESS+addedUrl;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                       // CommonUtilityMethods.displayToast(getApplicationContext(),response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+            }
+        });
+        queue.add(stringRequest);
+        return true;
+    }
+    
     
     private void initialiseFields(){
         TextView player1Label = (TextView)findViewById(R.id.xmlPlayer1Name);
@@ -405,7 +527,6 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
         return im;
     }
     
-    @Override
     public void processFinish(ArrayList<Player> players) {
         //initialise variables
         playersInTeam = players;
@@ -428,13 +549,12 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
         initialiseFields();
         
     }
-
-    @Override
+    
     public void processUserUpdate(String result) {
         if(result != ""){
             try {
                 budget = Integer.valueOf(result);
-                u.setBudget(budget);
+                golbalUser.setBudget(budget);
                 getSupportActionBar().setTitle("Your Team \t\tBudget: "+budget);
             } catch(NumberFormatException e) {
                 Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
@@ -446,30 +566,21 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
         
     }
 
-    @Override
-    public void processUserMatches(ArrayList<User> users) {
-        
-    }
+   
 
-    @Override
-    public void processLogin(User user) {
-        
-    }
 
-    @Override
     public void processInvites(final String sentBy) {
-        if(sentBy.contains("You have no")){
-            Toast.makeText(this,sentBy,Toast.LENGTH_LONG).show();
-        }else{
+        if(!sentBy.contains("You have no")){
             AlertDialog.Builder builder = new AlertDialog.Builder(UserTeamScreen.this);
             builder.setTitle("Received H2H Invite from: "+sentBy)
 
                     .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            ReplyToInviteHttpRequest replyH2H = new ReplyToInviteHttpRequest(UserTeamScreen.this,u.getId(),sentBy,u.getUsername());
-                            replyH2H.delegate = UserTeamScreen.this;
-                            replyH2H.execute();
+//                            ReplyToInviteHttpRequest replyH2H = new ReplyToInviteHttpRequest(UserTeamScreen.this,golbalUser.getId(),sentBy,golbalUser.getUsername());
+//                            replyH2H.delegate = UserTeamScreen.this;
+//                            replyH2H.execute();
+                            replyToInvite(sentBy);
                         }
 
                     })
@@ -484,12 +595,9 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
         }
         
     }
-
-    @Override
-    public void processDate(String epochDate) {
-        Long epoch = Long.getLong(epochDate);
-        
-    }
+    
+    
+    
 
     public void changePlayer(View view){
 
@@ -598,9 +706,6 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
                         playerName = (String) cs[which];
                         Player playerToSwap = playerMap.get(playerName);
                         int playerToSwapPosInTeam = playerToSwap.getPosInTeam();
-                        
-                        
-                        //ystem.out.println(currentPosInTeam+"-"+playerToSwapPosInTeam);
 
 
                         //setIDs
@@ -649,7 +754,7 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
     public void updateUserTeamInDB(int budget){
         
         sortPlayerNames();
-        String url = "?";
+        String url = "";
         int i = 1;
 
         for(String name : playersNames){
@@ -657,10 +762,13 @@ public class UserTeamScreen extends AppCompatActivity implements UserTeamAsyncRe
             url = url + "player"+i+"="+pl.getId()+"&";
             i++;
         }
-        url = url+"userID="+u.getId()+"&budget="+budget;
+        url = url+"userID="+golbalUser.getId()+"&budget="+budget;
 
-        UpdateUserTeamHttpResponse getWeeklyTeam = new UpdateUserTeamHttpResponse(UserTeamScreen.this,url);
-        getWeeklyTeam.delegate = this;
-        getWeeklyTeam.execute();
+//        UpdateUserTeamHttpResponse getWeeklyTeam = new UpdateUserTeamHttpResponse(UserTeamScreen.this,url);
+//        getWeeklyTeam.delegate = this;
+//        getWeeklyTeam.execute();
+        updateUserTeamRequest(url);
+        
+        
     }
 }
