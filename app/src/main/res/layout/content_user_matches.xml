@@ -15,11 +15,32 @@
     tools:showIn="@layout/activity_user_matches">
 
 
+    <ImageView
+        android:layout_width="100sp"
+        android:layout_height="100sp"
+        app:srcCompat="@drawable/h2h_opt"
+        android:layout_marginStart="106dp"
+        android:id="@+id/imageView8"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/xmlUMlistview"
+        android:layout_below="@+id/textView9"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="40dp" />
+
+    <TextView
+        android:text="Contests"
+        android:textSize="32sp"
+        android:elegantTextHeight="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="79dp"
+        android:id="@+id/textView9"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="119dp" />
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="93dp" />
 </RelativeLayout>

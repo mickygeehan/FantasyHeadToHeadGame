@@ -16,26 +16,16 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.michael.fantasyheadtoheadgame.Classes.MySingleton;
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.Classes.RequestResponseParser;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.FindHeadToHeadMatchHttpRequest;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.FindInvitesHttprequest;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.GetBudgetHTTPRequest;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.GetUserTeamHttpRequest;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.ReplyToInviteHttpRequest;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.SendHeadToHeadInviteHttpRequest;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.UpdateUserTeamHttpResponse;
-import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 import com.example.michael.fantasyheadtoheadgame.R;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.CommonUtilityMethods;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.Constants;
@@ -46,7 +36,7 @@ import java.util.HashMap;
 public class UserTeamScreen extends AppCompatActivity  {
     
     //User class
-    private User golbalUser;
+    private User globalUser;
     
     //user players
     private ArrayList<Player> playersInTeam;
@@ -78,9 +68,11 @@ public class UserTeamScreen extends AppCompatActivity  {
             public void onClick(View view) {
                 Snackbar.make(view, "Saved your team", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                generateUpdateTeamURL(golbalUser.getBudget());
+                generateUpdateTeamURL(globalUser.getBudget());
             }
         });
+
+        getSupportActionBar().setTitle("Your Team");
         
         //initialise request
         queue = MySingleton.getInstance(this.getApplicationContext()).
@@ -92,19 +84,19 @@ public class UserTeamScreen extends AppCompatActivity  {
         
         //get user
         User user = (User) getIntent().getSerializableExtra("UserClass");
-        golbalUser = user;
+        globalUser = user;
 
         startProgressBar();
         getHeadToHeadInvitesRequest();
         getBudgetRequest();
-        callGetUserTeamRequest(golbalUser.getId());
+        callGetUserTeamRequest(globalUser.getId());
     }
     
     @Override
     protected void onRestart() {
         super.onRestart();
         
-        callGetUserTeamRequest(golbalUser.getId());
+        callGetUserTeamRequest(globalUser.getId());
     }
 
     @Override
@@ -119,9 +111,9 @@ public class UserTeamScreen extends AppCompatActivity  {
         if (requestCode == 1) {
             if(resultCode == RESULT_OK) {
                 int updateBudget=data.getIntExtra("budget",0);
-                golbalUser.setBudget(updateBudget);
-                generateUpdateTeamURL(golbalUser.getBudget());
-                getSupportActionBar().setTitle("Your Team \t\tBudget: "+golbalUser.getBudget());
+                globalUser.setBudget(updateBudget);
+                generateUpdateTeamURL(globalUser.getBudget());
+                //getSupportActionBar().setTitle("Your Team \t\tBudget: "+globalUser.getBudget());
             }
         }
     }
@@ -129,7 +121,7 @@ public class UserTeamScreen extends AppCompatActivity  {
     
     //Data requests using Volley
     private boolean getBudgetRequest(){
-        String url =Constants.BUDGET_ADDRESS+"userID="+golbalUser.getId();
+        String url =Constants.BUDGET_ADDRESS+"userID="+ globalUser.getId();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -137,8 +129,8 @@ public class UserTeamScreen extends AppCompatActivity  {
                         //processUserUpdate(response);
                         if(response != ""){
                             budget = responseParser.parseBudget(response);
-                            golbalUser.setBudget(budget);
-                            getSupportActionBar().setTitle("Your Team \t\t\t\t\t\t\tBudget: "+budget);
+                            globalUser.setBudget(budget);
+                            //getSupportActionBar().setTitle("Your Team \t\t\t\t\t\t\tBudget: "+budget);
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -153,7 +145,7 @@ public class UserTeamScreen extends AppCompatActivity  {
     }
 
     private boolean getHeadToHeadInvitesRequest(){
-        String url =Constants.CHECKINVITES_ADDRESS+"username="+golbalUser.getUsername()+"&userID="+golbalUser.getId();
+        String url =Constants.CHECKINVITES_ADDRESS+"username="+ globalUser.getUsername()+"&userID="+ globalUser.getId();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -180,7 +172,7 @@ public class UserTeamScreen extends AppCompatActivity  {
     }
 
     private boolean callGetUserTeamRequest(int userID){
-        String url =Constants.USERTEAM_ADDRESS+"userID="+golbalUser.getId();
+        String url =Constants.USERTEAM_ADDRESS+"userID="+ globalUser.getId();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -204,12 +196,12 @@ public class UserTeamScreen extends AppCompatActivity  {
     }
 
     private boolean replyToInviteRequest(String sentBy){
-        String url =Constants.REPLY_TO_INVITE_ADDRESS+"acceptedUserID="+golbalUser.getId()+"&fromUsername="+sentBy+"&toUsername="+golbalUser.getUsername();
+        String url =Constants.REPLY_TO_INVITE_ADDRESS+"acceptedUserID="+ globalUser.getId()+"&fromUsername="+sentBy+"&toUsername="+ globalUser.getUsername();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response){
-                        CommonUtilityMethods.displayToast(getApplicationContext(),response);
+                        CommonUtilityMethods.displayToast(getApplicationContext(),"Invite accepted!");
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -222,7 +214,7 @@ public class UserTeamScreen extends AppCompatActivity  {
     }
 
     private boolean findRandomContestRequest(){
-        String url =Constants.FINDCONTEST_ADDRESS+"username="+golbalUser.getUsername()+"&userID="+golbalUser.getId();
+        String url =Constants.FINDCONTEST_ADDRESS+"username="+ globalUser.getUsername()+"&userID="+ globalUser.getId();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -240,7 +232,7 @@ public class UserTeamScreen extends AppCompatActivity  {
     }
 
     private boolean sendInviteToUserRequest(String opponent){
-        String url =Constants.SENDINVITE_ADDRESS+"fromUsername="+golbalUser.getUsername()+"&userID="+golbalUser.getId()+"&toUsername="+opponent;
+        String url =Constants.SENDINVITE_ADDRESS+"fromUsername="+ globalUser.getUsername()+"&userID="+ globalUser.getId()+"&toUsername="+opponent;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -280,8 +272,8 @@ public class UserTeamScreen extends AppCompatActivity  {
     public void openSearchScreen(View view){
         Intent intent = new Intent(UserTeamScreen.this, SearchPlayers.class);
         intent.putExtra("numberPlayers", playersInTeam.size());
-        intent.putExtra("userID", golbalUser.getId());
-        intent.putExtra("budget", golbalUser.getBudget());
+        intent.putExtra("userID", globalUser.getId());
+        intent.putExtra("budget", globalUser.getBudget());
         intent.putExtra("parser",responseParser);
         startActivityForResult(intent,1);
     }
@@ -295,9 +287,6 @@ public class UserTeamScreen extends AppCompatActivity  {
                 .setNeutralButton("Send Invite", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-//                        SendHeadToHeadInviteHttpRequest sendH2HInvite = new SendHeadToHeadInviteHttpRequest(UserTeamScreen.this,golbalUser.getId(),golbalUser.getUsername(),input.getText().toString());
-//                        sendH2HInvite.delegate = UserTeamScreen.this;
-//                        sendH2HInvite.execute();
                         sendInviteToUserRequest(input.getText().toString());
                     }
 
@@ -312,9 +301,6 @@ public class UserTeamScreen extends AppCompatActivity  {
                 .setNegativeButton("Random", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-//                        FindHeadToHeadMatchHttpRequest findH2H = new FindHeadToHeadMatchHttpRequest(UserTeamScreen.this,golbalUser.getId(),golbalUser.getUsername());
-//                        findH2H.delegate = UserTeamScreen.this;
-//                        findH2H.execute();
 
                         findRandomContestRequest();
                     }
@@ -335,7 +321,7 @@ public class UserTeamScreen extends AppCompatActivity  {
             url = url + "player"+i+"="+pl.getId()+"&";
             i++;
         }
-        url = url+"userID="+golbalUser.getId()+"&budget="+budget;
+        url = url+"userID="+ globalUser.getId()+"&budget="+budget;
 
         updateUserTeamRequest(url);
 
@@ -675,7 +661,7 @@ public class UserTeamScreen extends AppCompatActivity  {
                     .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-
+                            
                         }
 
                     });

@@ -59,7 +59,9 @@ public class Register extends Activity {
     }
     
     private boolean registerUserRequest(String appendToUrl){
+        
         String url =Constants.REGISTER_ADDRESS+appendToUrl;
+        System.out.println(url);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override

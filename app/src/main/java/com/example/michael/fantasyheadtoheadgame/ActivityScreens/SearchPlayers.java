@@ -65,6 +65,8 @@ public class SearchPlayers extends Activity{
         if(!initialiseParser()){
             responseParser = new RequestResponseParser();
         }
+
+        getActionBar().setTitle("Budget: "+budget);
         
         
         //initialising the listview and code for on click of listview
@@ -182,7 +184,7 @@ public class SearchPlayers extends Activity{
         }else{
             if(fnStr.isEmpty()){
                 if(isCleanInput(wnStr)){
-                    urlToAppend = "webName="+wnStr;
+                    urlToAppend = "webName="+wnStr+"&firstName= ";
                 }
             }else{
                 if(isCleanInput(wnStr)){

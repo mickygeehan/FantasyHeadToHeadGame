@@ -99,7 +99,9 @@ public class Login extends AppCompatActivity{
     }
     
     public void sendLoginRequest(String userName,String passwordHashed){
+        
         String url = Constants.LOGIN_ADDRESS+"userN="+userName+"&password="+passwordHashed;
+        System.out.println(url);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override

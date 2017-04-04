@@ -76,6 +76,7 @@ public class MainHub extends AppCompatActivity{
     protected void onRestart() {
         super.onRestart();
         //checkUserLoggedIn();
+        getDeadline();
     }
     
     private boolean initialiseParser(){
@@ -118,8 +119,20 @@ public class MainHub extends AppCompatActivity{
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response){
+                        System.out.println(response);
                         progressD.cancel();
-                        processDate(response);
+                        if(response.isEmpty()){
+                            CommonUtilityMethods.displayToast(getApplicationContext(),"Currently updating!");
+                            TextView xmlDate = (TextView)findViewById(R.id.xmlDateView);
+                            xmlDate.setText("Try again later");
+
+
+                            TextView gameWeek = (TextView)findViewById(R.id.xmlGameweek);
+                            gameWeek.setText("Updating...");
+                        }else{
+                            processDate(response);
+                        }
+                        
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -131,7 +144,7 @@ public class MainHub extends AppCompatActivity{
         queue.add(stringRequest);
 
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                5000,
+                6000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
     }
