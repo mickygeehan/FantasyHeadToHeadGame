@@ -38,9 +38,12 @@ public class SearchPlayers extends Activity{
     
     //Global Variables
     private ArrayList<Player> searchResults;
+    private ArrayList<Player> usersPlayers;
     private ListView searchResultsLv;
     private int sizeOfTeam = 0;
     private int budget = 0;
+    private boolean playerBought = false;
+    private Player playerIn = null;
 
     //Volley variables
     private RequestQueue queue;
@@ -57,6 +60,9 @@ public class SearchPlayers extends Activity{
         sizeOfTeam = (int) getIntent().getSerializableExtra("numberPlayers");
         final int userID = (int)getIntent().getSerializableExtra("userID");
         budget =  (int)getIntent().getSerializableExtra("budget");
+        usersPlayers = (ArrayList<Player>)getIntent().getSerializableExtra("usersTeam");
+        
+
 
         //initialise request
         queue = MySingleton.getInstance(this.getApplicationContext()).
@@ -85,19 +91,28 @@ public class SearchPlayers extends Activity{
                             .setMessage("Are you sure you want to buy "+ searchResults.get(itemPosition).getWebName())
                             .setPositiveButton("Buy", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    // continue with buy
-
+                                    //Check have enough money
                                     if(budget >= searchResults.get(itemPosition).getCost()){
-                                        int playerId = searchResults.get(itemPosition).getId();
-                                        int playerPositionInTeam = sizeOfTeam +1;
-                                        String urlToAppend = "player"+playerPositionInTeam+"="+playerId+"&userID="+userID;
-                                        updateUserTeamRequest(urlToAppend);
-                                        sizeOfTeam = sizeOfTeam +1;
-                                        budget = (int) (budget - searchResults.get(itemPosition).getCost());
-                                        CommonUtilityMethods.displayToast(getApplicationContext(),"Player added to team!");
+                                        //check player not in team
+                                        if(!notInTeam(searchResults.get(itemPosition).getWebName())){
+                                            int playerId = searchResults.get(itemPosition).getId();
+                                            int playerPos = searchResults.get(itemPosition).getPlayerPosition();
+                                            playerIn = searchResults.get(itemPosition);
+                                            budget = (int) (budget - searchResults.get(itemPosition).getCost());
+
+                                            //Get sub options in current team
+                                            ArrayList<String> replaceOptions = getSubOptions(playerPos);
+
+                                            //Show the replace dialog
+                                            showReplaceDialog(ct,replaceOptions);
+                                        }else{
+                                            CommonUtilityMethods.displayToast(getApplicationContext(),"Player already in team!");
+                                        }
+                                        
+                                        
            
                                     }else{
-                                        Toast.makeText(getApplicationContext(),"Not enough money",Toast.LENGTH_LONG).show();
+                                        CommonUtilityMethods.displayToast(getApplicationContext(),"Not enough money!");
                                     }
                                    
                                 }
@@ -108,11 +123,77 @@ public class SearchPlayers extends Activity{
                                 }
                             })
                             .setIcon(android.R.drawable.ic_input_get)
+                            .setCancelable(false)
                             .show();
                 }
                 
             }
         });
+        
+    }
+    
+    private boolean notInTeam(String toCheck){
+        for(Player p : usersPlayers){
+            if(p.getWebName().equals(toCheck)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private void showReplaceDialog(ContextThemeWrapper ct,ArrayList<String> playerOptions){
+        //final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(SearchPlayers.this, android.R.layout.select_dialog_singlechoice);
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                this,
+                R.layout.mylist,
+                playerOptions);
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(ct);
+        builder.setTitle("Select player to replace!");
+        builder.setAdapter(arrayAdapter, new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int item) {
+                // Do something with the selection
+                String playerToReplace = arrayAdapter.getItem(item);
+                
+                int i = 0;
+                int toRemove = 0;
+                int posInTeam = 0;
+                for(Player p: usersPlayers){
+                    if(p.getWebName().equals(playerToReplace)){
+                        posInTeam = p.getPosInTeam();
+                        p.setPosInTeam(posInTeam);
+                        toRemove = i;
+                    }
+                    i++;
+                }
+                //remove replace plaer and set position to new player
+                usersPlayers.remove(toRemove);
+                usersPlayers.get(usersPlayers.size()-1).setPosInTeam(posInTeam);
+
+                CommonUtilityMethods.displayToast(getApplicationContext(),"You have subbed in this player!");
+                
+                
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.setCancelable(false);
+        alert.show();
+
+        usersPlayers.add(playerIn);
+  
+    }
+    
+    private ArrayList<String> getSubOptions(int playerPos){
+        ArrayList<String> subOptions = new ArrayList<>();
+        
+        for(Player p: usersPlayers){
+            if(p.getPlayerPosition() == playerPos){
+                subOptions.add(p.getWebName());
+            }
+        }
+        
+        return subOptions;
     }
 
     private boolean updateUserTeamRequest(String addedUrl){
@@ -207,6 +288,7 @@ public class SearchPlayers extends Activity{
         //super.onBackPressed();
         Intent i = new Intent();
         i.putExtra("budget", budget);
+        i.putExtra("usersTeam",usersPlayers);
         setResult(RESULT_OK, i);
         finish();
     }

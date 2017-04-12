@@ -56,7 +56,7 @@ public class RequestResponseParser implements Serializable{
             for (int i = 0; i < n; ++i) {
                 final JSONObject player = geodata.getJSONObject(i);
                 playerObj = new Player(i+1,player.getString("firstName"),player.getString("secondName"),player.getString("webName"),player.getInt("teamCode"),
-                        player.getInt("id"),player.getInt("playerPosition"),player.getDouble("cost"));
+                        player.getInt("id"),player.getInt("playerPosition"),player.getDouble("cost"),player.getInt("code"));
 
                 players.add(playerObj);
             }
@@ -96,7 +96,7 @@ public class RequestResponseParser implements Serializable{
                 canAdd = true;
                 final JSONObject player = geodata.getJSONObject(i);
                 playerObj = new Player(i+1,player.getString("firstName"),player.getString("secondName"),player.getString("webName"),player.getInt("teamCode"),
-                        player.getInt("id"),player.getInt("playerPosition"),player.getDouble("cost"));
+                        player.getInt("id"),player.getInt("playerPosition"),player.getDouble("cost"),player.getInt("code"));
 
 
 

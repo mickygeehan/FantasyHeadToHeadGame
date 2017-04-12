@@ -1,5 +1,6 @@
 package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -39,6 +40,7 @@ public class Login extends AppCompatActivity{
     private SessionManager session;
     private RequestQueue queue;
     private RequestResponseParser responseParser;
+    private ProgressDialog progressD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,7 @@ public class Login extends AppCompatActivity{
         
         //Remove title bar
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getSupportActionBar().hide();
 
         //set content view AFTER ABOVE sequence (to avoid crash)
         this.setContentView(R.layout.login);
@@ -75,11 +78,9 @@ public class Login extends AppCompatActivity{
             //for sql prevention
             if(SecurityMethods.isCleanInput(userN)){
                 String passwordHashed = SecurityMethods.hashPassword(pass);
-//                LoginHttpRequest logIn = new LoginHttpRequest(context, userName.getText().toString(), passwordHashed);
-//                logIn.delegate = this;
-//                logIn.execute();
                 
                 //creating the RequestQueue
+                startProgressBar();
                 responseParser = new RequestResponseParser();
                 queue = MySingleton.getInstance(this.getApplicationContext()).
                         getRequestQueue();
@@ -96,6 +97,18 @@ public class Login extends AppCompatActivity{
             }
         }
         
+    }
+
+    private boolean startProgressBar(){
+        progressD = new ProgressDialog(this);
+        if(progressD != null){
+            progressD.setMessage("Logging in...");
+            progressD.show();
+            return true;
+        }
+
+        return false;
+
     }
     
     public void sendLoginRequest(String userName,String passwordHashed){
@@ -115,9 +128,11 @@ public class Login extends AppCompatActivity{
                             intent.putExtra("UserClass", u);
                             intent.putExtra("parser",responseParser);
                             context.startActivity(intent);
+                            progressD.cancel();
                             finishAffinity();
                         }else{
                             CommonUtilityMethods.displayToast(getApplicationContext(),"I'm sorry your username/password is incorrect!!");
+                            progressD.cancel();
                         }
                         
                     }

@@ -3,7 +3,10 @@ package com.example.michael.fantasyheadtoheadgame.ActivityScreens;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -14,6 +17,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -30,6 +34,9 @@ import com.example.michael.fantasyheadtoheadgame.R;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.CommonUtilityMethods;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.Constants;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -61,6 +68,10 @@ public class UserTeamScreen extends AppCompatActivity  {
         setContentView(R.layout.activity_test_home_screen);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -96,7 +107,7 @@ public class UserTeamScreen extends AppCompatActivity  {
     protected void onRestart() {
         super.onRestart();
         
-        callGetUserTeamRequest(globalUser.getId());
+        //callGetUserTeamRequest(globalUser.getId());
     }
 
     @Override
@@ -109,11 +120,16 @@ public class UserTeamScreen extends AppCompatActivity  {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
-            if(resultCode == RESULT_OK) {
+            if(resultCode == RESULT_OK){
                 int updateBudget=data.getIntExtra("budget",0);
+                
+                //initialise all new fields with new player
+                playersInTeam = (ArrayList<Player>)data.getSerializableExtra("usersTeam");
+                initialiseTeamVariables(playersInTeam);
+                sortPlayerNames();
+                initialiseFields();
                 globalUser.setBudget(updateBudget);
-                generateUpdateTeamURL(globalUser.getBudget());
-                //getSupportActionBar().setTitle("Your Team \t\tBudget: "+globalUser.getBudget());
+
             }
         }
     }
@@ -275,6 +291,7 @@ public class UserTeamScreen extends AppCompatActivity  {
         intent.putExtra("userID", globalUser.getId());
         intent.putExtra("budget", globalUser.getBudget());
         intent.putExtra("parser",responseParser);
+        intent.putExtra("usersTeam",playersInTeam);
         startActivityForResult(intent,1);
     }
     
@@ -402,7 +419,7 @@ public class UserTeamScreen extends AppCompatActivity  {
         getSubOptions(selectedPlayer);
 
         //displaypopup
-        showSubOptions(selectedPlayer,playerLabel);
+        showStats(selectedPlayer,playerLabel);
 
     }
     
@@ -410,25 +427,31 @@ public class UserTeamScreen extends AppCompatActivity  {
     //initialise methods
     public void initialiseTeamVariables(ArrayList<Player> players) {
         //initialise variables
-        playersInTeam = players;
+        playersInTeam = new ArrayList<>();
         playersNames = new ArrayList<>();
         playerMap = new HashMap<>();
         subOptions = new ArrayList<>();
 
+        //make sure players doesn't go over 11 to remove sub feature
+        //to be full removed upon release
+        int max = 10;
+        int i =0;
         for(Player p: players){
-            playersNames.add(p.getWebName());
-            playerMap.put(p.getWebName(),p);
-            if(p.getPlayerPosition() == 2){
-                numDef = numDef+1;
-            }else if(p.getPlayerPosition() == 3){
-                numMid = numMid+1;
-            }else if(p.getPlayerPosition() == 4){
-                numAtt = numAtt+1;
+            if(i <= 10){
+                playersInTeam.add(p);
+                playersNames.add(p.getWebName());
+                playerMap.put(p.getWebName(),p);
+                if(p.getPlayerPosition() == 2){
+                    numDef = numDef+1;
+                }else if(p.getPlayerPosition() == 3){
+                    numMid = numMid+1;
+                }else if(p.getPlayerPosition() == 4){
+                    numAtt = numAtt+1;
+                }
             }
+            i++;
+            
         }
-
-        
-
     }
     
     private boolean initialiseParser(){
@@ -639,7 +662,6 @@ public class UserTeamScreen extends AppCompatActivity  {
                 }else{
                     temp = temp + 1;
                 }
-
             }
             playerAdded = false;
 
@@ -668,6 +690,46 @@ public class UserTeamScreen extends AppCompatActivity  {
             builder.show();
         
         
+    }
+
+    private void showStats(final Player selectedPlayer,final TextView playerLabel){
+        //inflate layout for popup
+        LayoutInflater inflater = getLayoutInflater();
+        View alertLayout = inflater.inflate(R.layout.player_stats, null);
+        
+
+        String url = "https://platform-static-files.s3.amazonaws.com/premierleague/photos/players/110x140/p"+selectedPlayer.getImageCode()+".png";
+        Bitmap bm = getBitmapFromURL(url);
+        
+        //set views
+        ImageView playerImage = (ImageView)alertLayout.findViewById(R.id.xmlPlayerStatsImage);
+        playerImage.setImageBitmap(bm);
+        
+        TextView playerName = (TextView)alertLayout.findViewById(R.id.xmlPlayerFullNameStats);
+        playerName.setText(selectedPlayer.getFirstName()+" "+ selectedPlayer.getSecondName());
+        
+        
+        
+        final CharSequence[] cs = subOptions.toArray(new CharSequence[subOptions.size()]);
+        AlertDialog.Builder builder = new AlertDialog.Builder(UserTeamScreen.this);
+        builder.setView(alertLayout);
+        
+        builder.setTitle("Player stats for: "+selectedPlayer.getWebName())
+                .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        
+                    }
+
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+
+                });
+        builder.show();
     }
     
     private void showSubOptions(final Player selectedPlayer,final TextView playerLabel){
@@ -750,5 +812,19 @@ public class UserTeamScreen extends AppCompatActivity  {
 
     }
 
-    
+    public Bitmap getBitmapFromURL(String src) {
+        try {
+            java.net.URL url = new java.net.URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url
+                    .openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return myBitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

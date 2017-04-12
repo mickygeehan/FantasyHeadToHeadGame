@@ -16,6 +16,7 @@ public class SecurityMethods{
         return s.matches(pattern);
     }
 
+    
     public static String hashPassword(String password){
         final MessageDigest digest;
         String hashedPass = "";

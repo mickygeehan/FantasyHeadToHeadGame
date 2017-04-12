@@ -41,6 +41,7 @@ public class MainHub extends AppCompatActivity{
     private RequestQueue queue;
     private RequestResponseParser responseParser;
     private ProgressDialog progressD;
+    private boolean fromRestart = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +77,7 @@ public class MainHub extends AppCompatActivity{
     protected void onRestart() {
         super.onRestart();
         //checkUserLoggedIn();
+        fromRestart = true;
         getDeadline();
     }
     
@@ -150,13 +152,14 @@ public class MainHub extends AppCompatActivity{
     }
     
     private boolean startProgressBar(){
-        progressD = new ProgressDialog(this);
-        if(progressD != null){
-            progressD.setMessage("Loading...");
-            progressD.show();
-            return true;
+        if(!fromRestart){
+            progressD = new ProgressDialog(this);
+            if(progressD != null){
+                progressD.setMessage("Loading...");
+                progressD.show();
+                return true;
+            }
         }
-        
         return false;
         
     }
