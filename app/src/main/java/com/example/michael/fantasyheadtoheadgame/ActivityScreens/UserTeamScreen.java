@@ -98,7 +98,7 @@ public class UserTeamScreen extends AppCompatActivity  {
         globalUser = user;
 
         startProgressBar();
-        getHeadToHeadInvitesRequest();
+       // getHeadToHeadInvitesRequest();
         getBudgetRequest();
         callGetUserTeamRequest(globalUser.getId());
     }
@@ -167,7 +167,7 @@ public class UserTeamScreen extends AppCompatActivity  {
                     @Override
                     public void onResponse(String response){
                         
-                        if(responseParser.parseInvites(response)){
+                        if(responseParser.parseCheckInvites(response)){
                             showInvitePopup(response);
                         }
                         

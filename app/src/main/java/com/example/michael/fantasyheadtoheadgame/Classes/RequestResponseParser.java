@@ -73,13 +73,27 @@ public class RequestResponseParser implements Serializable{
         return Integer.valueOf(response);
     }
 
-    public boolean parseInvites(String sentBy) {
+    public boolean parseCheckInvites(String sentBy) {
         if(!sentBy.contains("You have no")){
             return true;
         }
         
         return false;
 
+    }
+    
+    public ArrayList<String> parseInvites(String response){
+
+        String[] parts = response.split("//");
+        ArrayList<String> invites = new ArrayList<>();
+        
+        for(String s:parts){
+            if(s.length() >0){
+                invites.add(s);
+            }
+        }
+        
+        return invites;
     }
     
     public ArrayList<Player> parseSearchResults(String results){

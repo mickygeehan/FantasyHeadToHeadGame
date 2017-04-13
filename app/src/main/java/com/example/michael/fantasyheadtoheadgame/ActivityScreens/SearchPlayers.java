@@ -176,7 +176,7 @@ public class SearchPlayers extends Activity{
                 
             }
         });
-        AlertDialog alert = builder.create();
+        AlertDialog alert = builder.create(); 
         alert.setCancelable(false);
         alert.show();
 
