@@ -219,6 +219,8 @@ public class UserContests extends AppCompatActivity{
                     @Override
                     public void onResponse(String response){
                         CommonUtilityMethods.displayToast(getApplicationContext(),"Invite accepted!");
+                        TextView empty = (TextView)findViewById(R.id.textView12);
+                        empty.setVisibility(View.INVISIBLE);
                     }
                 }, new Response.ErrorListener() {
             @Override

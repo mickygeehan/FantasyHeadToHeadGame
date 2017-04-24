@@ -41,7 +41,7 @@ public class SearchPlayers extends Activity{
     private ArrayList<Player> usersPlayers;
     private ListView searchResultsLv;
     private int sizeOfTeam = 0;
-    private int budget = 0;
+    private double budget = 0;
     private boolean playerBought = false;
     private Player playerIn = null;
 
@@ -59,7 +59,7 @@ public class SearchPlayers extends Activity{
         //initialise passed over variables
         sizeOfTeam = (int) getIntent().getSerializableExtra("numberPlayers");
         final int userID = (int)getIntent().getSerializableExtra("userID");
-        budget =  (int)getIntent().getSerializableExtra("budget");
+        budget =  (double)getIntent().getSerializableExtra("budget");
         usersPlayers = (ArrayList<Player>)getIntent().getSerializableExtra("usersTeam");
         
 
@@ -98,7 +98,7 @@ public class SearchPlayers extends Activity{
                                             int playerId = searchResults.get(itemPosition).getId();
                                             int playerPos = searchResults.get(itemPosition).getPlayerPosition();
                                             playerIn = searchResults.get(itemPosition);
-                                            budget = (int) (budget - searchResults.get(itemPosition).getCost());
+                                            budget = (double) (budget - searchResults.get(itemPosition).getCost());
 
                                             //Get sub options in current team
                                             ArrayList<String> replaceOptions = getSubOptions(playerPos);

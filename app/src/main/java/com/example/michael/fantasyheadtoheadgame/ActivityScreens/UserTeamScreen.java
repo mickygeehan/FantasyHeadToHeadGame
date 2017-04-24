@@ -121,7 +121,7 @@ public class UserTeamScreen extends AppCompatActivity  {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
             if(resultCode == RESULT_OK){
-                double updateBudget=data.getIntExtra("budget",0);
+                double updateBudget=data.getDoubleExtra("budget",0);
                 
                 //initialise all new fields with new player
                 playersInTeam = (ArrayList<Player>)data.getSerializableExtra("usersTeam");

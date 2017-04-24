@@ -35,7 +35,7 @@ public class RequestResponseParser implements Serializable{
 
             for (int i = 0; i < n; ++i) {
                 final JSONObject user = geodata.getJSONObject(i);
-                userObj = new User(user.getString("username"),user.getString("email"),user.getInt("ID"),user.getInt("budget"));
+                userObj = new User(user.getString("username"),user.getString("email"),user.getInt("ID"),user.getDouble("budget"));
             }
 
         } catch (JSONException e) {
@@ -69,8 +69,8 @@ public class RequestResponseParser implements Serializable{
         return players;
     }
     
-    public int parseBudget(String response){
-        return Integer.valueOf(response);
+    public double parseBudget(String response){
+        return Double.valueOf(response);
     }
 
     public boolean parseCheckInvites(String sentBy) {
