@@ -8,9 +8,10 @@ import java.io.Serializable;
 
 public class User implements Serializable {
     private String username,email;
-    private int id,budget,points;
+    private int id,points;
+    private double budget;
 
-    public User(String username, String email, int id, int budget) {
+    public User(String username, String email, int id, double budget) {
         this.username = username;
         this.email = email;
         this.id = id;
@@ -22,7 +23,7 @@ public class User implements Serializable {
         this.id = id;
 
     }
-    public User(String username, String email, int id, int budget,int points) {
+    public User(String username, String email, int id, double budget,int points) {
         this.username = username;
         this.email = email;
         this.id = id;
@@ -56,11 +57,11 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public int getBudget() {
+    public double getBudget() {
         return budget;
     }
 
-    public void setBudget(int budget) {
+    public void setBudget(double budget) {
         this.budget = budget;
     }
 

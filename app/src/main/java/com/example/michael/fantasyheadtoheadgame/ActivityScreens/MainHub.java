@@ -141,6 +141,7 @@ public class MainHub extends AppCompatActivity{
             public void onErrorResponse(VolleyError error) {
                 progressD.cancel();
                 CommonUtilityMethods.displayToast(getApplicationContext(),"There seems to be a server issue");
+                getDeadline();
             }
         });
         queue.add(stringRequest);

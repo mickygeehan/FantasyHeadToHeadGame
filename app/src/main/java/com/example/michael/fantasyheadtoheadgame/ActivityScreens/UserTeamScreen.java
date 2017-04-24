@@ -53,7 +53,7 @@ public class UserTeamScreen extends AppCompatActivity  {
     
     //num of players in pos
     private int numDef,numMid,numAtt = 0;
-    private int budget = 0;
+    private double budget = 0;
 
     //For volley requests
     private RequestQueue queue;
@@ -121,7 +121,7 @@ public class UserTeamScreen extends AppCompatActivity  {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
             if(resultCode == RESULT_OK){
-                int updateBudget=data.getIntExtra("budget",0);
+                double updateBudget=data.getIntExtra("budget",0);
                 
                 //initialise all new fields with new player
                 playersInTeam = (ArrayList<Player>)data.getSerializableExtra("usersTeam");
@@ -327,7 +327,7 @@ public class UserTeamScreen extends AppCompatActivity  {
 
     }
 
-    public void generateUpdateTeamURL(int budget){
+    public void generateUpdateTeamURL(double budget){
 
         sortPlayerNames();
         String url = "";
@@ -699,6 +699,7 @@ public class UserTeamScreen extends AppCompatActivity  {
         
 
         String url = "https://platform-static-files.s3.amazonaws.com/premierleague/photos/players/110x140/p"+selectedPlayer.getImageCode()+".png";
+        System.out.println(url);
         Bitmap bm = getBitmapFromURL(url);
         
         //set views
