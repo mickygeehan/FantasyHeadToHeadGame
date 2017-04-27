@@ -186,7 +186,7 @@ public class UserContests extends AppCompatActivity{
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 R.layout.mylist,
-                invites);
+                invites); 
         final ContextThemeWrapper ct = new ContextThemeWrapper(this, R.style.myDialog);
         AlertDialog.Builder builder = new AlertDialog.Builder(ct);
         builder.setTitle("Your invites!\n Select a user to accept");

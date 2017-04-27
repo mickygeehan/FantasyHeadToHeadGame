@@ -62,7 +62,7 @@ public class User implements Serializable {
     }
 
     public void setBudget(double budget) {
-        this.budget = budget;
+        this.budget = budget; 
     }
 
     public int getPoints() {

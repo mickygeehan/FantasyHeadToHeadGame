@@ -17,7 +17,7 @@ import com.example.michael.fantasyheadtoheadgame.R;
 import java.util.ArrayList;
 
 public class SpecifiedUserContest extends Activity {
-
+ 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
