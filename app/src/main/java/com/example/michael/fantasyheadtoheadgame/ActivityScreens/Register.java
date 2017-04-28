@@ -18,7 +18,6 @@ import com.example.michael.fantasyheadtoheadgame.Classes.MySingleton;
 import com.example.michael.fantasyheadtoheadgame.Classes.RequestResponseParser;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.CommonUtilityMethods;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.Constants;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.RegisterHttpRequest;
 import com.example.michael.fantasyheadtoheadgame.R;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.SecurityMethods;
 

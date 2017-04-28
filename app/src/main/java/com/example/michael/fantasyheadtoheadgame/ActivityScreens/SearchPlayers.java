@@ -24,9 +24,9 @@ import com.example.michael.fantasyheadtoheadgame.Classes.MySingleton;
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.Classes.RequestResponseParser;
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.UpdateUserTeamHttpResponse;
+
 import com.example.michael.fantasyheadtoheadgame.R;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.SearchPlayerHttpRequest;
+
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.CommonUtilityMethods;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.Constants;
@@ -257,7 +257,6 @@ public class SearchPlayers extends Activity{
         EditText webName = (EditText)findViewById(R.id.xmlSecondNameQuery);
         String fnStr = firstName.getText().toString();
         String wnStr = webName.getText().toString();
-        SearchPlayerHttpRequest searchPlayersReq;
         
         //Checking serach queries arent empty
         if(fnStr.isEmpty() && wnStr.isEmpty()){

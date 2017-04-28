@@ -7,7 +7,6 @@ package com.example.michael.fantasyheadtoheadgame.UtilityClasses;
 public class Constants {
     
     //server constants
-
     //public static String IP_ADDRESS = "http://10.0.2.2:8888/FantasyShowDown/";
     public static String IP_ADDRESS = "https://fantasyshowdown.000webhostapp.com/FantasyShowDown/";
     public static String LOGIN_ADDRESS = IP_ADDRESS+"login.php?";
@@ -30,4 +29,7 @@ public class Constants {
     public static final String INVALID_USERNAME = "That is an invalid username!";
     public static final String EMAIL_EMPTY = "Please enter an email!";
     public static final String FULLNAME_EMPTY = "Please enter a name!";
+    
+    //MainHub strings
+    
 }

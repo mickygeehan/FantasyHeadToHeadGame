@@ -14,11 +14,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.GetUserTeamHttpRequest;
+
 import com.example.michael.fantasyheadtoheadgame.Classes.Player;
 import com.example.michael.fantasyheadtoheadgame.R;
 import com.example.michael.fantasyheadtoheadgame.ActivityScreens.SearchPlayers;
-import com.example.michael.fantasyheadtoheadgame.HttpRequests.UpdateUserTeamHttpResponse;
+
 import com.example.michael.fantasyheadtoheadgame.Classes.User;
 import com.example.michael.fantasyheadtoheadgame.Interfaces.UserTeamAsyncResponse;
 
@@ -76,7 +76,7 @@ public abstract class UserHomeScreen extends AppCompatActivity implements UserTe
         //if so say new team available check your head to head games
         //if not display the weekly team in this screen and a menu button
 
-        displayWeeklyTeam(userID);
+//        displayWeeklyTeam(userID);
 
         weeklyTeamSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -209,11 +209,11 @@ public abstract class UserHomeScreen extends AppCompatActivity implements UserTe
     }
 
 
-    private void displayWeeklyTeam(int id){
-        GetUserTeamHttpRequest getWeeklyTeam = new GetUserTeamHttpRequest(context,id);
-        getWeeklyTeam.delegate = this;
-        getWeeklyTeam.execute();
-    }
+//    private void displayWeeklyTeam(int id){
+//        GetUserTeamHttpRequest getWeeklyTeam = new GetUserTeamHttpRequest(context,id);
+//        getWeeklyTeam.delegate = this;
+//        getWeeklyTeam.execute();
+//    }
 
     public void searchScreen(View view){
         Intent intent = new Intent(UserHomeScreen.this, SearchPlayers.class);
@@ -234,9 +234,9 @@ public abstract class UserHomeScreen extends AppCompatActivity implements UserTe
         }
         url = url+"userID="+userID;
 
-        UpdateUserTeamHttpResponse getWeeklyTeam = new UpdateUserTeamHttpResponse(context,url);
-        getWeeklyTeam.delegate = this;
-        getWeeklyTeam.execute();
+//        UpdateUserTeamHttpResponse getWeeklyTeam = new UpdateUserTeamHttpResponse(context,url);
+//        getWeeklyTeam.delegate = this;
+//        getWeeklyTeam.execute();
     }
 
     @Override

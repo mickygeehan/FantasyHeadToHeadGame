@@ -2,9 +2,11 @@ package com.example.michael.fantasyheadtoheadgame;
 
 import com.example.michael.fantasyheadtoheadgame.ActivityScreens.Login;
 import com.example.michael.fantasyheadtoheadgame.ActivityScreens.UserTeamScreen;
+import com.example.michael.fantasyheadtoheadgame.Classes.RequestResponseParser;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.CommonUtilityMethods;
 import com.example.michael.fantasyheadtoheadgame.UtilityClasses.SecurityMethods;
 
+import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
@@ -16,6 +18,7 @@ import static org.junit.Assert.*;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 public class ExampleUnitTest {
+    RequestResponseParser parse = new RequestResponseParser();
     @Test
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 2);
@@ -48,4 +51,16 @@ public class ExampleUnitTest {
         assertThat(CommonUtilityMethods.validIP("192d.168 1.1"), is(false));
     }
     
+    
+    //Parser
+    @Test
+    public void checkDoubleParser(){
+        double check = parse.parseBudget("15");
+        assertTrue(check == 15);
+        
+        check = parse.parseBudget(" ");
+        assertTrue(check == -100);
+    }
+
+
 }

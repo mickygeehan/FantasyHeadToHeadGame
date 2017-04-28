@@ -1,6 +1,7 @@
 package com.example.michael.fantasyheadtoheadgame.Classes;
 
 import android.content.DialogInterface;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 
 import com.example.michael.fantasyheadtoheadgame.ActivityScreens.UserTeamScreen;
@@ -70,7 +71,21 @@ public class RequestResponseParser implements Serializable{
     }
     
     public double parseBudget(String response){
-        return Double.valueOf(response);
+//        String regex = "\\d+";
+//        if(response.matches())){
+//            return Double.valueOf(response);
+//        }
+//        //return -100 if parse budget contains a string of any type
+//        return -100
+        Double toReturn = Double.valueOf(-100);
+        try{
+            toReturn = Double.parseDouble(response);
+        }catch(NumberFormatException e){
+            
+        }
+        
+        return toReturn;
+        
     }
 
     public boolean parseCheckInvites(String sentBy) {
